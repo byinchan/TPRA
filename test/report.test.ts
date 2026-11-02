@@ -80,7 +80,7 @@ test("number check flags wrong counts, ratings, tier, dates and decisions", asyn
 test("number check ignores IDs and standard names, and accepts correct figures", async () => {
   const f = factsOf(await standardDemoState());
   const text =
-    "DDQ-11 and IRA-13 (F-DDQ-11-GAP) relate to ISO/IEC 27001 and SOC 2, per NIST SP 800-161 Rev. 1. One Gap, three Needs evidence, 6 open findings, 2 open follow-ups, 26 rows, next review 2028-11-02.";
+    "DDQ-11 and IRA-13 (F-DDQ-11-GAP) relate to ISO/IEC 27001 and SOC 2, per NIST SP 800-161 Rev. 1. One Gap, eight Needs evidence, 11 open findings, 2 open follow-ups, 26 rows, next review 2028-11-02.";
   assert.deepEqual(checkNarrative({ ...savedNarrative(), method: text }, f), []);
 });
 
@@ -111,7 +111,7 @@ test("approval needs a clean number check, due dates on every open finding and a
 test("unassigned owners do not block approval but are listed as unassigned", async () => {
   const s = setPreparer(withDueDates(await drafted()), "B. Chan", AT);
   const f = factsOf(s);
-  assert.equal(f.findingCounts.unassignedOpen, 6);
+  assert.equal(f.findingCounts.unassignedOpen, 11);
   assert.ok(f.findings.every((x) => x.unassigned));
   assert.deepEqual(approvalCheck(s).blockers, []);
 });

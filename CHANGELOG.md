@@ -380,3 +380,9 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 ### Changed after review (PR 9 branch)
 - **Excel restructured into 5 tabs:** Summary (title and label/value rows, no tables), Inherent Risk (4 columns), Due Diligence (6 columns), Findings (6 columns), Audit trail (AI suggestions, override reasons, confirmation status, rules applied, IRA answer changes, closing notes). Bold header with light fill, wrapped top-aligned text, frozen header row, widths capped at 45. Figures still come from `computeOutcome`. Checked by writing the file and reading the XML back.
 - **About and Content notice pages removed.** Their content is in the README. The app footer is one line linking to the README on GitHub; CLAUDE.md no longer asks for in-app explanation pages.
+
+## PR 10: recorded demo output replaces the placeholders (2026-11-02)
+- `data/demo/v1-halden-review.json` and `v1-halden-narrative.json` are now real runs of claude-haiku-5-5 (one live call each, nothing dropped or truncated), saved unchanged. The "placeholder" labels no longer show.
+- Compared with the placeholder, the model rates 5 more rows Needs evidence (DDQ-02, 14, 16, 17, 22). With all 26 confirmed as suggested: 17 Satisfactory, 1 Gap, 8 Needs evidence; control strength Adequate; residual Medium (provisional); Approve with conditions; 11 open findings (was 6).
+- The narrative passes the number check. It applies to the standard demo path (every suggestion accepted); other paths show the existing "figures differ" warning.
+- Tests updated for the new counts.

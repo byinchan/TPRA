@@ -1,10 +1,10 @@
 {
   "sampleId": "v1-halden",
   "source": {
-    "kind": "mock",
-    "model": null,
-    "generatedAt": "2026-11-02T00:00:00.000Z",
-    "note": "Placeholder written by the developer for development and demo mode. It is not model output. It will be replaced by a recorded model run once the API key is set."
+    "kind": "model",
+    "model": "claude-haiku-5-5",
+    "generatedAt": "2026-11-02T19:00:12.383Z",
+    "note": "Recorded run of claude-haiku-5-5 on the sample as loaded, 2026-11-02. Saved for demo mode; reviewed by the developer before commit."
   },
   "answersUsed": [
     {
@@ -77,185 +77,196 @@
       {
         "ddqId": "DDQ-01",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it maintains a documented information security program.",
+        "rationale": "Vendor affirms a documented Information Security Program; no inherent risk answer makes this insufficient.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-02",
-        "rating": "Satisfactory",
-        "rationale": "Vendor states its ISMS is ISO/IEC 27001 certified.",
+        "rating": "Needs evidence",
+        "rationale": "Vendor claims an ISO/IEC 27001 certified ISMS, but no certificate has been seen.",
         "conflict": null,
-        "evidenceToRequest": "Current ISO/IEC 27001 certificate with scope statement"
+        "evidenceToRequest": "Current ISO/IEC 27001 certificate with scope statement and certifying body name and expiry date."
       },
       {
         "ddqId": "DDQ-03",
         "rating": "Needs evidence",
-        "rationale": "Certificate is offered on request but has not been received, so the certification claim is not yet verified.",
+        "rationale": "Certificate is offered only on request, so PUC has not yet seen it.",
         "conflict": null,
-        "evidenceToRequest": "Current ISO/IEC 27001 certificate"
+        "evidenceToRequest": "Current ISO/IEC 27001 certificate, provided before rating is finalized."
       },
       {
         "ddqId": "DDQ-04",
         "rating": "Satisfactory",
-        "rationale": "Vendor states executive leadership reviews information security.",
+        "rationale": "Vendor affirms executive leadership reviews information security.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-05",
         "rating": "Satisfactory",
-        "rationale": "MFA is stated as required for employee access to corporate systems.",
+        "rationale": "Vendor affirms MFA for employee access to corporate systems, relevant given IRA-04 system access.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-06",
         "rating": "Satisfactory",
-        "rationale": "Vendor states privileged accounts are reviewed regularly.",
+        "rationale": "Vendor affirms regular review of privileged accounts; IRA-05 says the vendor needs no privileged access to PUC systems.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-07",
         "rating": "Satisfactory",
-        "rationale": "Vendor states access is removed promptly on termination.",
+        "rationale": "Vendor affirms prompt access removal on termination, relevant given IRA-04 system access.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-08",
         "rating": "Satisfactory",
-        "rationale": "Confidential client information is stated as encrypted in transit.",
+        "rationale": "Vendor affirms encryption in transit for confidential client information, which IRA-01 says will be shared.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-09",
         "rating": "Satisfactory",
-        "rationale": "Confidential client information is stated as encrypted at rest.",
+        "rationale": "Vendor affirms encryption at rest for confidential client information, which IRA-01 says will be shared.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-10",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it has documented retention and disposal procedures.",
+        "rationale": "Vendor affirms documented retention and disposal procedures for data it holds.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-11",
         "rating": "Gap",
-        "rationale": "Storage in Canada is not committed; residency depends on the engagement, so PUC data may be held outside Canada.",
+        "rationale": "Vendor does not commit to storing PUC data in Canada, and residency is undetermined, while regulatory requirements apply.",
         "conflict": {
           "iraIds": [
-            "IRA-13"
+            "IRA-13",
+            "IRA-14"
           ],
-          "note": "IRA-13 (data leaving the country) is Unknown; this response suggests data may leave Canada, which supports resolving it as Yes or keeping it open."
+          "note": "IRA-13 (data leaving the country) is Unknown and IRA-14 says regulatory requirements apply, yet the vendor has not committed to Canadian residency."
         },
-        "evidenceToRequest": "Written commitment on where PUC data will be stored and processed"
+        "evidenceToRequest": "Written data residency commitment for PUC data, stating storage and processing locations, and any offshore access."
       },
       {
         "ddqId": "DDQ-12",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it maintains a documented incident response plan.",
+        "rationale": "Vendor affirms a documented Incident Response Plan.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-13",
         "rating": "Satisfactory",
-        "rationale": "Vendor states incident response exercises are run periodically.",
+        "rationale": "Vendor affirms periodic incident response exercises.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-14",
-        "rating": "Satisfactory",
-        "rationale": "Vendor commits to notify PUC of incidents affecting engagement data; no notification timeframe is stated.",
+        "rating": "Needs evidence",
+        "rationale": "Vendor says it will notify PUC of incidents affecting engagement data, but gives no timeline and it is not shown as contractual.",
         "conflict": null,
-        "evidenceToRequest": "Contractual notification timeframe"
+        "evidenceToRequest": "Contractual incident notification clause with a stated notification timeline."
       },
       {
         "ddqId": "DDQ-15",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it maintains business continuity and disaster recovery plans.",
+        "rationale": "Vendor affirms BC and DR plans, relevant because IRA-07 marks the service as business-critical.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-16",
-        "rating": "Satisfactory",
-        "rationale": "Vendor states recovery plans are tested periodically.",
-        "conflict": null,
-        "evidenceToRequest": null
+        "rating": "Needs evidence",
+        "rationale": "Vendor says recovery plans are tested periodically, but no test results are provided for a business-critical service.",
+        "conflict": {
+          "iraIds": [
+            "IRA-07"
+          ],
+          "note": "IRA-07 marks the service as business-critical, so untested recovery plans would matter more."
+        },
+        "evidenceToRequest": "Summary of the most recent recovery plan test, with date and outcome."
       },
       {
         "ddqId": "DDQ-17",
-        "rating": "Satisfactory",
-        "rationale": "Vendor states a SOC 2 Type II audit has been completed.",
+        "rating": "Needs evidence",
+        "rationale": "Vendor claims a completed SOC 2 Type II audit, but the report has not been seen.",
         "conflict": null,
-        "evidenceToRequest": null
+        "evidenceToRequest": "Current SOC 2 Type II report with audit period and any exceptions noted."
       },
       {
         "ddqId": "DDQ-18",
         "rating": "Needs evidence",
-        "rationale": "Executive summary is offered under NDA but has not been received, so the SOC 2 result cannot be reviewed yet.",
+        "rationale": "Executive summary is offered only under NDA, so PUC has not seen it.",
         "conflict": null,
-        "evidenceToRequest": "SOC 2 Type II executive summary (under NDA)"
+        "evidenceToRequest": "Executive summary of the SOC 2 Type II report, received under NDA."
       },
       {
         "ddqId": "DDQ-19",
         "rating": "Satisfactory",
-        "rationale": "Vendor states independent penetration tests are conducted periodically.",
+        "rationale": "Vendor affirms periodic independent penetration tests.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-20",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it maintains a third-party risk management program.",
+        "rationale": "Vendor affirms it maintains a third-party risk management program.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-21",
         "rating": "Satisfactory",
-        "rationale": "Vendor describes risk-based due diligence before onboarding and reassessment over the lifecycle.",
+        "rationale": "Vendor affirms risk-based due diligence and lifecycle reassessment of critical third parties and subcontractors.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-22",
-        "rating": "Satisfactory",
-        "rationale": "Vendor states subcontractors are subject to security requirements.",
-        "conflict": null,
-        "evidenceToRequest": null
-      },
-      {
-        "ddqId": "DDQ-23",
         "rating": "Needs evidence",
-        "rationale": "\"Not expected\" is not a commitment that no subcontractors will be used for this engagement.",
+        "rationale": "Vendor says subcontractors are subject to security requirements, but IRA-12 says subcontractor involvement is still Unknown.",
         "conflict": {
           "iraIds": [
             "IRA-12"
           ],
-          "note": "IRA-12 (subcontractors involved) is Unknown; the response points to No but is not firm enough to resolve it."
+          "note": "IRA-12 is Unknown, so the subcontractor security requirements cannot be checked against actual subcontractors."
         },
-        "evidenceToRequest": "Written confirmation that no subcontractors will access PUC data, or a list of those that will"
+        "evidenceToRequest": "Named list of any subcontractors and copies of the security clauses that flow down to them."
+      },
+      {
+        "ddqId": "DDQ-23",
+        "rating": "Needs evidence",
+        "rationale": "Vendor says no subcontractors are expected, which is not a firm commitment, and IRA-12 is still Unknown.",
+        "conflict": {
+          "iraIds": [
+            "IRA-12"
+          ],
+          "note": "IRA-12 is Unknown and the response only says subcontractors are not expected, so involvement is not ruled out."
+        },
+        "evidenceToRequest": "Written confirmation that no subcontractors will be used, or a full list of any that will be, with the flow-down clauses."
       },
       {
         "ddqId": "DDQ-24",
         "rating": "Satisfactory",
-        "rationale": "Vendor states it has internal policies on responsible AI use.",
+        "rationale": "Vendor affirms internal policies on responsible AI use, relevant to an AI governance engagement.",
         "conflict": null,
         "evidenceToRequest": null
       },
       {
         "ddqId": "DDQ-25",
         "rating": "Satisfactory",
-        "rationale": "Vendor states employees receive guidance on appropriate AI use.",
+        "rationale": "Vendor affirms employees receive guidance on appropriate AI use.",
         "conflict": null,
         "evidenceToRequest": null
       },
@@ -273,14 +284,22 @@
           "IRA-07",
           "IRA-08"
         ],
-        "note": "The service is marked business-critical, yet an outage is not expected to significantly impact operations."
+        "note": "The service is marked business-critical but an outage is marked as not significantly impacting operations, which needs reconciling."
       },
       {
         "iraIds": [
           "IRA-03",
           "IRA-14"
         ],
-        "note": "No regulated information is processed, yet regulatory requirements are marked as applicable; the requirement that applies should be named."
+        "note": "Regulatory requirements are marked as applicable but no regulated information is marked as processed, so the basis for the regulatory applicability should be confirmed."
+      },
+      {
+        "iraIds": [
+          "IRA-04",
+          "IRA-05",
+          "IRA-06"
+        ],
+        "note": "The vendor is marked as accessing internal systems but not as needing privileged access or connecting to the corporate network, so the access method should be confirmed."
       }
     ]
   }
