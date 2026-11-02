@@ -105,3 +105,40 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
   - The finding comes from `lib/findings.ts` (`collectFindings`).
   - The recommendation cannot be "Approve" while it is open.
   - Tested: FIPPA triggered, all 26 rows Satisfactory, Strong controls, Low residual → "Approve with conditions".
+
+## PR 3: screen 1, intake and inherent risk (2026-11-02)
+
+### Added
+- **Screen 1 at `/`:**
+  - "Load sample vendor" fills all 16 IRA answers and all 26 questionnaire responses in one click.
+  - Answers are grouped by area. Each row shows the rating table and the v1 rating. IRA-16 is labelled "Added after v1, not in the manual assessment".
+- **The Code panel recalculates live:**
+  - Inherent risk with the rule clause that decided it, plus High/Medium/Low counts.
+  - Tier, due diligence depth and reassessment cadence.
+  - Open follow-ups: every Unknown answer.
+  - FIPPA status: "checked, not triggered" with the reason, or the triggered message plus "Opens a finding…" and the not-legal-advice note.
+- **Change notice:** when an edit changes the inherent risk/tier or the FIPPA flag, a notice states what changed, which edit caused it and the rule that now applies (`describeChange` in lib/ira.ts). Example: "Inherent risk changed from Medium to High and the tier from Tier 2 to Tier 1 after IRA-13 changed from Unknown to Yes. Rule: High because 4 answers are rated High (threshold 4)."
+- **Traceability:**
+  - Changing an answer requires a reason (max 300 characters).
+  - Each change is kept in the row's history (from, to, time, reason) along with the answer as loaded.
+  - Edited rows carry a "Human-edited" badge.
+- **Session state (`lib/session.ts`):**
+  - sessionStorage key `tpra.assessment.v1` with a schema version.
+  - Every field is checked on load: IDs in order, answer values, history entries, text length caps.
+  - Unknown fields are dropped. Anything invalid is discarded and the screen says so.
+  - The UI says the data lives in this tab only.
+- **`lib/sample.ts`:** the sample registry, with the vendor disclaimer verbatim. Sample 2 will plug in here.
+- **Tests:** 33 passing.
+  - Session round-trip.
+  - 11 invalid-state cases.
+  - Extra fields dropped.
+  - Reason required.
+  - IRA-13 → Yes notice text.
+  - Combined inherent risk + FIPPA notice for IRA-16 → Yes.
+
+### Decisions (defaults, open to change)
+- **IRA-16 = Yes** is also a 4th High for Deloitte, so it moves inherent risk to High as well as triggering FIPPA. Both notices are shown.
+- **The assessment date** is the analyst's local date when the sample is loaded.
+- **"Start over"** asks for confirmation, then clears the tab's state.
+- **Screens 2 and 3** show as greyed-out steps until their PRs land.
+- **On narrow screens** a compact sticky summary (inherent risk · tier · follow-ups) stays at the top and links to the full Calculated panel below the questions. On wide screens the panel stays in view beside them.

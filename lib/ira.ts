@@ -92,6 +92,32 @@ export interface InherentAssessment {
   fippa: FippaResult;
 }
 
+/**
+ * After an analyst edits one answer: if the inherent risk (and so the tier) or the FIPPA flag
+ * changed, say what changed, which edit caused it, and the rule clause that now applies.
+ */
+export function describeChange(
+  before: InherentAssessment,
+  after: InherentAssessment,
+  edit: { id: string; from: string; to: string },
+): string[] {
+  const cause = `after ${edit.id} changed from ${edit.from} to ${edit.to}`;
+  const notes: string[] = [];
+  if (before.inherent.level !== after.inherent.level) {
+    const tierPart =
+      before.tier.label === after.tier.label ? "" : ` and the tier from ${before.tier.label} to ${after.tier.label}`;
+    notes.push(
+      `Inherent risk changed from ${before.inherent.level} to ${after.inherent.level}${tierPart} ${cause}. Rule: ${after.inherent.reason}`,
+    );
+  }
+  if (before.fippa.triggered !== after.fippa.triggered) {
+    notes.push(
+      `FIPPA flag ${after.fippa.triggered ? "triggered" : "no longer triggered"} ${cause}. Rule: ${after.fippa.reason}`,
+    );
+  }
+  return notes;
+}
+
 /** Everything screen 1 shows, from the IRA answers alone. */
 export function assessInherent(answers: readonly IraAnswer[]): InherentAssessment {
   const inherent = inherentRisk(answers);
