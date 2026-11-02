@@ -13,8 +13,8 @@ const AT = "2026-11-02T19:00:00.000Z";
 
 async function approved() {
   let s = await standardDemoState();
-  const n = validateNarrative(DEMO_NARRATIVES["v1-deloitte"]!.output)!.narrative;
-  s = applyNarrative(s, { ok: true, mode: "demo", demoReason: "requested", demoMatchesFacts: true, source: DEMO_NARRATIVES["v1-deloitte"]!.source, narrative: n, truncated: 0 }, AT);
+  const n = validateNarrative(DEMO_NARRATIVES["v1-halden"]!.output)!.narrative;
+  s = applyNarrative(s, { ok: true, mode: "demo", demoReason: "requested", demoMatchesFacts: true, source: DEMO_NARRATIVES["v1-halden"]!.source, narrative: n, truncated: 0 }, AT);
   for (const f of computeOutcome(s).findings) s = setDueDate(s, f.id, "2027-01-15", AT);
   return { s: setPreparer(s, "B. Chan", AT), n };
 }
@@ -45,5 +45,5 @@ test("workbook has the three sheets and every figure matches the computed outcom
   assert.ok(fnd.rows.slice(1).every((r) => r[5] === "2027-01-15"));
   assert.ok(ddq.rows.slice(1).every((r) => r[10] === "Confirmed" && r[6] !== ""));
   assert.equal(ira.rows.find((r) => r[0] === "IRA-16")![8], "Added after v1, not in the manual assessment");
-  assert.match(workbookFileName(a), /^TPRA-Deloitte-2026-11-02\.xlsx$/);
+  assert.match(workbookFileName(a), /^TPRA-Halden-Advisory-fictional-2026-11-02\.xlsx$/);
 });
