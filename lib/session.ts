@@ -74,7 +74,18 @@ export interface ReviewMeta {
 export const FINDING_STATUSES = ["Open", "Closed"] as const;
 export const DEFAULT_OWNER = "Vendor owner (to assign)";
 export const OWNER_MAX = 80;
-export const FINDING_ID = /^F-(IRA-\d{2}|DDQ-\d{2}|FIPPA)$/;
+/** F-IRA-12 (follow-up), F-DDQ-03-NE / F-DDQ-11-GAP (questionnaire row + kind), F-FIPPA. */
+export const FINDING_ID = /^F-(IRA-\d{2}|DDQ-\d{2}-(NE|GAP)|FIPPA)$/;
+export const FINDING_KINDS = ["Follow-up", "Gap", "Needs evidence", "FIPPA"] as const;
+export const FINDING_SOURCES = ["IRA follow-up", "Due diligence", "FIPPA"] as const;
+
+/** What a finding was when it was closed, so it stays visible after its source changes. */
+export interface FindingSnapshot {
+  kind: (typeof FINDING_KINDS)[number];
+  source: (typeof FINDING_SOURCES)[number];
+  sourceRow: string;
+  title: string;
+}
 
 /** Analyst-entered details for a finding. Findings themselves are derived by code (lib/findings.ts). */
 export interface FindingMeta {
@@ -85,6 +96,8 @@ export interface FindingMeta {
   status: (typeof FINDING_STATUSES)[number];
   /** Required to close. */
   closeNote: string | null;
+  /** Set when the finding is closed. */
+  snapshot: FindingSnapshot | null;
   history: { at: string; detail: string }[];
 }
 
@@ -215,6 +228,12 @@ function isFindingMeta(v: unknown): v is FindingMeta {
     FINDING_STATUSES.some((st) => st === v.status) &&
     (v.closeNote === null || (isShortString(v.closeNote, REASON_MAX) && (v.closeNote as string).trim() !== "")) &&
     (v.status === "Open" || v.closeNote !== null) &&
+    (v.snapshot === null ||
+      (isObject(v.snapshot) &&
+        FINDING_KINDS.some((k) => k === (v.snapshot as Record<string, unknown>).kind) &&
+        FINDING_SOURCES.some((k) => k === (v.snapshot as Record<string, unknown>).source) &&
+        isShortString((v.snapshot as Record<string, unknown>).sourceRow, 10) &&
+        isShortString((v.snapshot as Record<string, unknown>).title, 400))) &&
     Array.isArray(v.history) &&
     v.history.length <= HISTORY_MAX &&
     v.history.every((h) => isObject(h) && isTimestamp(h.at) && isShortString(h.detail, DETAIL_MAX))
@@ -311,12 +330,13 @@ export function parseState(raw: string | null): AssessmentState | null {
       confirmed,
       history: history.map(({ at, action, detail }) => ({ at, action, detail })),
     })),
-    findings: (v.findings as FindingMeta[]).map(({ id, owner, dueDate, status, closeNote, history }) => ({
+    findings: (v.findings as FindingMeta[]).map(({ id, owner, dueDate, status, closeNote, snapshot, history }) => ({
       id,
       owner,
       dueDate,
       status,
       closeNote,
+      snapshot: snapshot && { kind: snapshot.kind, source: snapshot.source, sourceRow: snapshot.sourceRow, title: snapshot.title },
       history: history.map(({ at, detail }) => ({ at, detail })),
     })),
   };

@@ -46,7 +46,25 @@ export function computeOutcome(state: AssessmentState): Outcome {
       .map((r) => ({ id: r.id, question: question(r.id), rating: r.decision!.rating })),
     fippa: a.fippa,
   });
-  const findings = withDetails(seeds, state.findings);
+  // Follow-ups answered since they were Unknown, with the note from the answer's history.
+  const resolvedFollowUps = state.ira.flatMap((r) => {
+    const fromUnknown = [...r.history].reverse().find((h) => h.from === "Unknown");
+    return r.answer !== "Unknown" && fromUnknown
+      ? [
+          {
+            seed: {
+              id: `F-${r.id}`,
+              source: "IRA follow-up" as const,
+              sourceRow: r.id,
+              kind: "Follow-up" as const,
+              title: `Resolve unknown answer: ${question(r.id)}`,
+            },
+            note: `Answered ${fromUnknown.to}: ${fromUnknown.reason}`,
+          },
+        ]
+      : [];
+  });
+  const findings = withDetails(seeds, state.findings, resolvedFollowUps);
   const open = findings.filter((f) => f.status === "Open");
   const openNeedsEvidence = open.filter((f) => f.kind === "Needs evidence").length;
 

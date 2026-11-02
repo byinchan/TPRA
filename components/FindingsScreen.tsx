@@ -2,11 +2,11 @@
 // Screen 3 (part a): findings and the calculated outcome. Code computes; the analyst sets owner, due date, status.
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
-import { closeFinding, reopenFinding, setDueDate, setOwner, type Finding } from "@/lib/findings.ts";
+import { closeFinding, closeNeedsEvidence, reopenFinding, setDueDate, setOwner, type Finding } from "@/lib/findings.ts";
 import { computeOutcome } from "@/lib/outcome.ts";
 import { SAMPLES } from "@/lib/sample.ts";
 import { DEFAULT_OWNER, OWNER_MAX, REASON_MAX, type AssessmentState } from "@/lib/session.ts";
-import { FIPPA } from "@/config/rules.ts";
+import { FIPPA, RECOMMENDATION_MEANING } from "@/config/rules.ts";
 import { Badge, LevelPill } from "./Badge.tsx";
 import { Steps } from "./Steps.tsx";
 import { useAssessment } from "./useAssessment.ts";
@@ -80,6 +80,9 @@ export function FindingsScreen() {
             <p className="text-xs uppercase opacity-70">Recommendation</p>
             <p className="text-xl font-semibold">{o.recommendation.decision}</p>
             <p className="text-sm">{o.recommendation.reason}</p>
+            {RECOMMENDATION_MEANING[o.recommendation.decision] && (
+              <p className="mt-2 border-t border-current/20 pt-2 text-sm">{RECOMMENDATION_MEANING[o.recommendation.decision]}</p>
+            )}
           </div>
         ) : (
           <div className="space-y-2 rounded border border-stone-300 bg-white p-3 text-sm">
@@ -184,6 +187,7 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
   const [owner, setOwnerText] = useState(f.owner);
   const [closing, setClosing] = useState(false);
   const [note, setNote] = useState("");
+  const [rerate, setRerate] = useState<"Satisfactory" | "Gap">("Satisfactory");
   useEffect(() => setOwnerText(f.owner), [f.owner]);
   const sourceHref = f.source === "Due diligence" ? `/review#${f.sourceRow}` : f.source === "IRA follow-up" ? "/review" : "/";
 
@@ -247,14 +251,21 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
         </div>
         <div>
           {f.status === "Closed" ? (
-            <button
-              type="button"
-              onClick={() => apply((s) => reopenFinding(s, f.id, now()))}
-              className="rounded border border-stone-300 px-3 py-1 text-sm hover:bg-stone-100"
-            >
-              Reopen
-            </button>
-          ) : f.closable ? (
+            !f.archived &&
+            (f.kind === "Gap" || f.kind === "FIPPA") && (
+              <button
+                type="button"
+                onClick={() => apply((s) => reopenFinding(s, f, now()))}
+                className="rounded border border-stone-300 px-3 py-1 text-sm hover:bg-stone-100"
+              >
+                Reopen
+              </button>
+            )
+          ) : f.closeBy === "screen-2" ? (
+            <Link href="/review" className="text-xs text-sky-700 underline">
+              Resolve on screen 2
+            </Link>
+          ) : (
             <button
               type="button"
               onClick={() => setClosing(true)}
@@ -262,10 +273,6 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
             >
               Close…
             </button>
-          ) : (
-            <Link href="/review" className="text-xs text-sky-700 underline">
-              Resolve on screen 2
-            </Link>
           )}
         </div>
       </div>
@@ -273,8 +280,28 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
 
       {closing && f.status === "Open" && (
         <div className="mt-2 space-y-2 rounded border border-stone-300 bg-stone-50 p-2">
+          {f.closeBy === "re-rate" && (
+            <div>
+              <p className="text-xs text-stone-700">
+                Closing a Needs evidence finding re-rates {f.sourceRow} and re-confirms it. Control strength recalculates
+                from the new rating.
+              </p>
+              <label htmlFor={`${uid}-rerate`} className="mt-1 block text-xs font-medium">
+                Re-rate {f.sourceRow} as
+              </label>
+              <select
+                id={`${uid}-rerate`}
+                value={rerate}
+                onChange={(e) => setRerate(e.target.value as "Satisfactory" | "Gap")}
+                className="rounded border border-stone-300 px-2 py-1 text-sm"
+              >
+                <option>Satisfactory</option>
+                <option>Gap</option>
+              </select>
+            </div>
+          )}
           <label htmlFor={`${uid}-note`} className="block text-xs font-medium">
-            How was this resolved? (required)
+            {f.closeBy === "re-rate" ? "Evidence received (required; recorded as the reason)" : "How was this resolved? (required)"}
           </label>
           <input
             id={`${uid}-note`}
@@ -289,13 +316,15 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
               type="button"
               disabled={!note.trim()}
               onClick={() => {
-                apply((s) => closeFinding(s, f, note, now()));
+                apply((s) =>
+                  f.closeBy === "re-rate" ? closeNeedsEvidence(s, f, rerate, note, now()) : closeFinding(s, f, note, now()),
+                );
                 setClosing(false);
                 setNote("");
               }}
               className="rounded bg-stone-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
             >
-              Close finding
+              {f.closeBy === "re-rate" ? `Re-rate ${f.sourceRow} ${rerate} and close` : "Close finding"}
             </button>
             <button type="button" onClick={() => setClosing(false)} className="px-3 py-1 text-xs">
               Cancel
@@ -303,7 +332,12 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
           </div>
         </div>
       )}
-      {f.status === "Closed" && f.closeNote && <p className="mt-1 text-xs text-stone-700">Closed: {f.closeNote}</p>}
+      {f.status === "Closed" && f.closeNote && (
+        <p className="mt-1 text-xs text-stone-700">
+          Closed: {f.closeNote}
+          {f.archived && <span className="text-stone-500"> (source has since changed; kept for traceability)</span>}
+        </p>
+      )}
       {f.history.length > 0 && (
         <details className="mt-2 text-xs">
           <summary className="cursor-pointer text-stone-600">History ({f.history.length})</summary>

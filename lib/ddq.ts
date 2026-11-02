@@ -94,18 +94,19 @@ export function editDecision(state: AssessmentState, id: string, patch: Partial<
   });
 }
 
-/** Confirms a row. If the rating differs from the AI's, a reason is required. */
+/** Confirms a row. If the rating differs from the AI's, a reason is required (any reason given is recorded). */
 export function confirmRow(state: AssessmentState, id: string, overrideReason: string | null, at: string): AssessmentState {
   return mapRow(state, id, (row) => {
     const d = effectiveDecision(row);
     if (!d) throw new Error("Choose a rating before confirming.");
-    let reason: string | null = null;
-    if (needsOverrideReason(row)) {
-      reason = overrideReason?.trim() ?? "";
-      if (!reason) throw new Error("A reason is required when your rating differs from the AI suggestion.");
-      if (reason.length > REASON_MAX) throw new Error(`Reason is longer than ${REASON_MAX} characters.`);
+    // A reason is required when the rating differs from the AI's; one given anyway is recorded too.
+    const reason = overrideReason?.trim() || null;
+    if (needsOverrideReason(row) && !reason) {
+      throw new Error("A reason is required when your rating differs from the AI suggestion.");
     }
-    const detail = reason ? `${d.rating} (AI: ${row.ai!.rating}). Reason: ${reason}` : d.rating;
+    if (reason && reason.length > REASON_MAX) throw new Error(`Reason is longer than ${REASON_MAX} characters.`);
+    const vsAi = row.ai && row.ai.rating !== d.rating ? ` (AI: ${row.ai.rating})` : "";
+    const detail = reason ? `${d.rating}${vsAi}. Reason: ${reason}` : d.rating;
     return {
       ...row,
       decision: d,

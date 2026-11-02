@@ -282,3 +282,20 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **"Provisional" lasts while any Needs-evidence finding is open.** Closing one (e.g. "certificate received") clears it. The row's rating stays as confirmed, so control strength does not change.
 - **Due dates are optional for now.** The report-approval PR can require them; that is Bernadette's call.
 - **Consequence of the confirmed rules, for Bernadette to note:** resolving IRA-13 to Yes from DDQ-11 makes Deloitte High inherent with Adequate controls. That gives High residual risk, so the recommendation is **Escalate - do not approve yet**. A test now locks this in.
+
+### Update: Bernadette's PR 6 decisions (2026-11-02)
+1. **Escalate is kept** (IRA-13 → Yes leads to Escalate). Screen 3 adds one line, kept in `config/rules.ts` `RECOMMENDATION_MEANING` so the report can reuse it: a designated risk owner must decide whether to accept the residual risk; it does not mean the vendor is rejected.
+2. **The recommendation waits for all 26 confirmed rows** (confirmed).
+3. **Report approval requires a due date on every open finding.** Owners may stay "Vendor owner (to assign)", but the report lists them as unassigned. This is recorded in CLAUDE.md and enforced in PR 7.
+4. **Closing a Needs evidence finding re-rates its source row** (Satisfactory or Gap) with the evidence note as the reason, then re-confirms the row. Control strength recalculates.
+   - `closeNeedsEvidence` in `lib/findings.ts`.
+   - Tested both ways: re-rating DDQ-03 Satisfactory gives 1 Gap / 2 NE; re-rating DDQ-18 Gap gives 2 Gaps, which is Weak, so Escalate.
+
+### Changes needed to support decision 4
+- **Finding IDs now include the kind** (`F-DDQ-03-NE`, `F-DDQ-11-GAP`). A Needs evidence row re-rated Gap closes its NE finding and opens a separate Gap finding.
+- **Closed findings stay listed** after their source changes. This covers a re-rated row (kept from a snapshot taken at closing) and a follow-up resolved on screens 1–2 (from the IRA answer history). They are marked "kept for traceability" and cannot be reopened from screen 3.
+- **Who can reopen what:**
+  - Gap and FIPPA findings can be reopened.
+  - A Needs evidence finding reopens automatically if its row is re-rated Needs evidence on screen 2.
+- **`confirmRow` records a reason whenever one is given**, not only when the rating differs from the AI's.
+- **Tests:** 65 passing.

@@ -50,8 +50,8 @@ test("follow-ups and non-satisfactory confirmed rows become findings with stable
     findings.map((f) => [f.id, f.source, f.title]),
     [
       ["F-IRA-12", "IRA follow-up", "Resolve unknown answer: Will subcontractors be involved?"],
-      ["F-DDQ-03", "Due diligence", "Needs evidence: Q3"],
-      ["F-DDQ-11", "Due diligence", "Gap: Q11"],
+      ["F-DDQ-03-NE", "Due diligence", "Needs evidence: Q3"],
+      ["F-DDQ-11-GAP", "Due diligence", "Gap: Q11"],
     ],
   );
 });
