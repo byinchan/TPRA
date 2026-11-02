@@ -150,3 +150,33 @@ export function validateReview(
 
   return { review: { rows, iraInconsistencies }, guardrails: g };
 }
+
+// ---------- strict checks for AI data read back from session storage (no repair, just yes/no) ----------
+
+const capped = (v: unknown, max: number) => typeof v === "string" && v.length <= max;
+
+function isConflict(v: unknown, iraIds: ReadonlySet<string>, minIds: number): v is AiConflict {
+  return (
+    isObject(v) &&
+    Object.keys(v).length === 2 &&
+    Array.isArray(v.iraIds) &&
+    v.iraIds.length >= minIds &&
+    v.iraIds.every((id) => typeof id === "string" && iraIds.has(id)) &&
+    capped(v.note, LIMITS.maxNoteChars)
+  );
+}
+
+export function isStoredAiRow(v: unknown, ddqId: string, iraIds: ReadonlySet<string>): v is AiRowSuggestion {
+  return (
+    isObject(v) &&
+    v.ddqId === ddqId &&
+    DDQ_RATINGS.some((r) => r === v.rating) &&
+    capped(v.rationale, LIMITS.maxRationaleChars) &&
+    (v.conflict === null || isConflict(v.conflict, iraIds, 1)) &&
+    (v.evidenceToRequest === null || capped(v.evidenceToRequest, LIMITS.maxEvidenceChars))
+  );
+}
+
+export function isStoredInconsistency(v: unknown, iraIds: ReadonlySet<string>): v is AiInconsistency {
+  return isConflict(v, iraIds, 2);
+}

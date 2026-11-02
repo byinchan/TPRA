@@ -203,3 +203,44 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **Rate limit and daily cap are in-memory, per server instance.** On Vercel, separate instances do not share counts, and counts reset when an instance restarts. The real budget cap is the prepaid Anthropic credit with auto-reload off. The README will say so.
 - **Anthropic 429, 402 and outages fall back to demo**, so a visitor always sees a working flow, clearly labelled. Other errors are shown as errors, so the guardrail is visible.
 - **Questionnaire responses are not editable in v1.** A blank "new vendor" intake is in the v2 backlog, so the only analyst input to the model is the IRA answer enum.
+
+## PR 5: screen 2, due diligence review (2026-11-02)
+
+### Added
+- **Screen 2 at `/review`:**
+  - "Get AI suggestions" calls `/api/review`. "Use saved demo review" is the alternative.
+  - Each of the 26 rows shows three separate columns: **Vendor response | AI suggestion (AI badge) | Analyst decision (Analyst badge)**.
+  - The AI column shows the rating, rationale, any conflict (IRA IDs, their questions and a note) and the evidence to request.
+- **The analyst edits and confirms each row:**
+  - Changing the AI's rating requires an override reason before Confirm is enabled.
+  - Editing a confirmed row reopens it.
+  - Badges: AI-suggested / Human-edited / Analyst-entered, plus Confirmed / Awaiting review.
+  - Only confirmed rows count.
+- **History per row:** AI suggestion (live/demo + reason) → edits → confirmation (with any override reason) → reopen. The AI's original suggestion is never overwritten.
+- **Review banner:**
+  - "AI-generated, human-reviewed", Live or Demo mode, and the plain-language demo reason.
+  - A placeholder notice while the demo output is the developer-written mock.
+  - A warning when the analyst's IRA answers differ from those the saved demo was made for.
+  - A **validation line** (removed IDs, removed rows, missing rows, shortened text, or "all 26 suggestions passed").
+- **IRA inconsistencies panel (AI, advisory):** each flagged pair with its questions and current answers, plus a link to screen 1. Nothing changes automatically.
+- **Open follow-ups panel:**
+  - The analyst resolves an Unknown IRA answer to Yes or No from a chosen questionnaire row, with a required note.
+  - The source row defaults to the row the AI flagged.
+  - The answer is updated through the same audited path as screen 1 ("Resolved from DDQ-11: …") and re-scores.
+  - The change notice names the rule.
+- **Code panel:** inherent risk and tier, confirmed count, awaiting count, Gap / Needs evidence among confirmed rows, and control strength with its rule (marked "Partial" until all rows are confirmed).
+- **Narrow screens:** a sticky summary bar.
+- **Tier 1 notice:** Tier 1 calls for the full SIG plus evidence, but this prototype only has the 26-question SIG Lite–based questionnaire. The screen says so whenever the tier is 1.
+- **Navigation:** step pills link between screens once an assessment is loaded. Screen 1 has a "Continue to due diligence review" button.
+- **`lib/ddq.ts`** (pure, tested): `applyAiReview`, `editDecision`, `confirmRow`, `reopenRow`, `discardAiReview`, `resolveFollowUp`, `confirmedRatings`, `rowBadges`.
+- **`lib/ai/types.ts`:** result types with no runtime dependencies, so the browser bundle never includes the prompt, demo data or SDK (checked: the client bundle has no prompt text, key name or API URL).
+- **Tests:** 56 passing (8 new). Confirming all 26 demo suggestions unchanged reproduces the back-test: Adequate, 1 Gap, 3 Needs evidence.
+
+### Decisions (defaults, open to change)
+- **Session state is now version 2** (`tpra.assessment.v2`), holding the AI suggestion, decision, override reason and history per row.
+  - A tab still holding version 1 data fails validation and starts fresh, with the "discarded" notice.
+  - AI data read back from storage is re-checked strictly; any unknown ID rejects the whole state.
+- **One AI review per assessment.** "Discard and start again" clears suggestions and decisions but keeps IRA answers. This avoids silently mixing two AI runs.
+- **No "confirm all" button:** each row is confirmed on its own, which is the point of the human review.
+- **Text edits are saved when the field loses focus**, so history records edits rather than keystrokes.
+- **Inconsistency flags are advisory:** they never change an answer on their own.

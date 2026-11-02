@@ -6,37 +6,10 @@ import { ANSWERS, type IraAnswer } from "../types.ts";
 import { DEMO_REVIEWS } from "./demo.ts";
 import type { Limiter } from "./limits.ts";
 import { REVIEW_SYSTEM_PROMPT, buildReviewUserMessage } from "./prompt.ts";
-import { validateReview, type AiReview, type Guardrails } from "./schema.ts";
+import { validateReview } from "./schema.ts";
+import type { DemoReason, ModelCallResult, ReviewResult } from "./types.ts";
 
-export type DemoReason = "requested" | "no-key" | "rate-limited" | "daily-cap" | "budget" | "service-unavailable";
-
-export interface ReviewSource {
-  /** "model" = a real model run (live, or recorded for demo). "mock" = a placeholder written by the developer. */
-  kind: "model" | "mock";
-  model: string | null;
-  generatedAt: string;
-  note: string;
-}
-
-export interface ReviewSuccess {
-  ok: true;
-  mode: "live" | "demo";
-  demoReason: DemoReason | null;
-  /** Demo only: false when the analyst's IRA answers differ from the ones the saved output used. */
-  demoMatchesAnswers: boolean | null;
-  source: ReviewSource;
-  review: AiReview;
-  guardrails: Guardrails;
-}
-
-export interface ReviewFailure {
-  ok: false;
-  /** Generic, user-facing. Never includes model output or user text. */
-  error: string;
-  canUseDemo: boolean;
-}
-
-export type ReviewResult = ReviewSuccess | ReviewFailure;
+export type { DemoReason, ReviewResult, ReviewSource, ReviewSuccess, ReviewFailure, ModelCallResult } from "./types.ts";
 
 export interface ReviewRequest {
   sampleId: string;
@@ -54,14 +27,6 @@ export class UpstreamError extends Error {
     this.kind = kind;
     this.requestId = requestId;
   }
-}
-
-export interface ModelCallResult {
-  /** Parsed JSON from the model, or undefined if the response had no usable JSON. */
-  json: unknown;
-  stopReason: string | null;
-  requestId: string | null;
-  model: string;
 }
 
 export interface ReviewDeps {

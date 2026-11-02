@@ -4,6 +4,9 @@ const STYLES = {
   Code: "bg-sky-100 text-sky-800 ring-sky-200",
   Analyst: "bg-amber-100 text-amber-800 ring-amber-200",
   "Human-edited": "bg-orange-100 text-orange-800 ring-orange-200",
+  "AI-suggested": "bg-violet-50 text-violet-800 ring-violet-200",
+  "Analyst-entered": "bg-amber-50 text-amber-800 ring-amber-200",
+  "Awaiting review": "bg-white text-stone-600 ring-stone-300",
   Confirmed: "bg-emerald-100 text-emerald-800 ring-emerald-200",
   Draft: "bg-stone-100 text-stone-700 ring-stone-300",
 } as const;
@@ -30,6 +33,20 @@ export function LevelPill({ level, large }: { level: keyof typeof LEVEL_STYLES; 
       }`}
     >
       {level}
+    </span>
+  );
+}
+
+const RATING_STYLES = {
+  Satisfactory: "bg-emerald-50 text-emerald-800 ring-emerald-200",
+  "Needs evidence": "bg-amber-50 text-amber-900 ring-amber-300",
+  Gap: "bg-red-50 text-red-800 ring-red-200",
+} as const;
+
+export function RatingPill({ rating }: { rating: keyof typeof RATING_STYLES }) {
+  return (
+    <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${RATING_STYLES[rating]}`}>
+      {rating}
     </span>
   );
 }
