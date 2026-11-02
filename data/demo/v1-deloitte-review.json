@@ -1,0 +1,287 @@
+{
+  "sampleId": "v1-deloitte",
+  "source": {
+    "kind": "mock",
+    "model": null,
+    "generatedAt": "2026-11-02T00:00:00.000Z",
+    "note": "Placeholder written by the developer for development and demo mode. It is not model output. It will be replaced by a recorded model run once the API key is set."
+  },
+  "answersUsed": [
+    {
+      "id": "IRA-01",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-02",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-03",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-04",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-05",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-06",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-07",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-08",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-09",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-10",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-11",
+      "answer": "No"
+    },
+    {
+      "id": "IRA-12",
+      "answer": "Unknown"
+    },
+    {
+      "id": "IRA-13",
+      "answer": "Unknown"
+    },
+    {
+      "id": "IRA-14",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-15",
+      "answer": "Yes"
+    },
+    {
+      "id": "IRA-16",
+      "answer": "No"
+    }
+  ],
+  "output": {
+    "rows": [
+      {
+        "ddqId": "DDQ-01",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it maintains a documented information security program.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-02",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states its ISMS is ISO/IEC 27001 certified.",
+        "conflict": null,
+        "evidenceToRequest": "Current ISO/IEC 27001 certificate with scope statement"
+      },
+      {
+        "ddqId": "DDQ-03",
+        "rating": "Needs evidence",
+        "rationale": "Certificate is offered on request but has not been received, so the certification claim is not yet verified.",
+        "conflict": null,
+        "evidenceToRequest": "Current ISO/IEC 27001 certificate"
+      },
+      {
+        "ddqId": "DDQ-04",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states executive leadership reviews information security.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-05",
+        "rating": "Satisfactory",
+        "rationale": "MFA is stated as required for employee access to corporate systems.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-06",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states privileged accounts are reviewed regularly.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-07",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states access is removed promptly on termination.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-08",
+        "rating": "Satisfactory",
+        "rationale": "Confidential client information is stated as encrypted in transit.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-09",
+        "rating": "Satisfactory",
+        "rationale": "Confidential client information is stated as encrypted at rest.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-10",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it has documented retention and disposal procedures.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-11",
+        "rating": "Gap",
+        "rationale": "Storage in Canada is not committed; residency depends on the engagement, so PUC data may be held outside Canada.",
+        "conflict": {
+          "iraIds": [
+            "IRA-13"
+          ],
+          "note": "IRA-13 (data leaving the country) is Unknown; this response suggests data may leave Canada, which supports resolving it as Yes or keeping it open."
+        },
+        "evidenceToRequest": "Written commitment on where PUC data will be stored and processed"
+      },
+      {
+        "ddqId": "DDQ-12",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it maintains a documented incident response plan.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-13",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states incident response exercises are run periodically.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-14",
+        "rating": "Satisfactory",
+        "rationale": "Vendor commits to notify PUC of incidents affecting engagement data; no notification timeframe is stated.",
+        "conflict": null,
+        "evidenceToRequest": "Contractual notification timeframe"
+      },
+      {
+        "ddqId": "DDQ-15",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it maintains business continuity and disaster recovery plans.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-16",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states recovery plans are tested periodically.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-17",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states a SOC 2 Type II audit has been completed.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-18",
+        "rating": "Needs evidence",
+        "rationale": "Executive summary is offered under NDA but has not been received, so the SOC 2 result cannot be reviewed yet.",
+        "conflict": null,
+        "evidenceToRequest": "SOC 2 Type II executive summary (under NDA)"
+      },
+      {
+        "ddqId": "DDQ-19",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states independent penetration tests are conducted periodically.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-20",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it maintains a third-party risk management program.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-21",
+        "rating": "Satisfactory",
+        "rationale": "Vendor describes risk-based due diligence before onboarding and reassessment over the lifecycle.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-22",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states subcontractors are subject to security requirements.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-23",
+        "rating": "Needs evidence",
+        "rationale": "\"Not expected\" is not a commitment that no subcontractors will be used for this engagement.",
+        "conflict": {
+          "iraIds": [
+            "IRA-12"
+          ],
+          "note": "IRA-12 (subcontractors involved) is Unknown; the response points to No but is not firm enough to resolve it."
+        },
+        "evidenceToRequest": "Written confirmation that no subcontractors will access PUC data, or a list of those that will"
+      },
+      {
+        "ddqId": "DDQ-24",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states it has internal policies on responsible AI use.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-25",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states employees receive guidance on appropriate AI use.",
+        "conflict": null,
+        "evidenceToRequest": null
+      },
+      {
+        "ddqId": "DDQ-26",
+        "rating": "Satisfactory",
+        "rationale": "Vendor states customer information will not be used to train AI models.",
+        "conflict": null,
+        "evidenceToRequest": null
+      }
+    ],
+    "iraInconsistencies": [
+      {
+        "iraIds": [
+          "IRA-07",
+          "IRA-08"
+        ],
+        "note": "The service is marked business-critical, yet an outage is not expected to significantly impact operations."
+      },
+      {
+        "iraIds": [
+          "IRA-03",
+          "IRA-14"
+        ],
+        "note": "No regulated information is processed, yet regulatory requirements are marked as applicable; the requirement that applies should be named."
+      }
+    ]
+  }
+}

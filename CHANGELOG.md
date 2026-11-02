@@ -142,3 +142,64 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **"Start over"** asks for confirmation, then clears the tab's state.
 - **Screens 2 and 3** show as greyed-out steps until their PRs land.
 - **On narrow screens** a compact sticky summary (inherent risk · tier · follow-ups) stays at the top and links to the full Calculated panel below the questions. On wide screens the panel stays in view beside them.
+
+## PR 4: AI review route and demo mode (2026-11-02)
+
+### Added
+- **`POST /api/review` (server-only):** the AI proposes, per questionnaire row:
+  - a rating (Satisfactory / Gap / Needs evidence);
+  - a one-line rationale;
+  - any conflict with IRA answers;
+  - the evidence to request.
+
+  It also lists IRA inconsistencies. It never rates inherent risk, scores anything or recommends a decision.
+- **Model:** `claude-haiku-5-5`, set in `config/ai.ts` and overridable with the `ANTHROPIC_MODEL` env var.
+  - Effort is set explicitly to `medium`, which is Haiku 5.5's default.
+  - Pricing is $0.10 / $0.50 per million input / output tokens (Claude API docs, checked 2026-11-02).
+  - A review is roughly a few thousand tokens each way, so well under a cent per call.
+- **SDK:** `@anthropic-ai/sdk` 1.3.0 (Apache-2.0).
+  - The Claude API guidance for TypeScript projects is to use the official SDK rather than raw fetch.
+  - It provides typed errors (429 `RateLimitError`, 402 `billing_error`, 5xx, connection) and request IDs.
+- **Structured outputs:** `output_config.format` with a JSON schema, instead of forced tool use.
+  - This is the documented way to get schema-valid JSON.
+  - Forced `tool_choice` is rejected by several current models.
+  - No Zod: the schema is plain JSON, and our own validator checks every response anyway.
+- **The model is treated as an untrusted component (`lib/ai/schema.ts` `validateReview`).** Live and saved outputs pass the same checks:
+  - Unknown DDQ/IRA IDs are dropped and counted.
+  - Duplicate or malformed rows are dropped and counted.
+  - Missing rows are listed, not filled.
+  - Text is whitespace-normalised and length-capped, with truncations counted.
+  - The results are returned as `guardrails`, so the UI can show them.
+- **Prompt-injection posture (`lib/ai/prompt.ts`):**
+  - The browser sends only the 16 IRA answers (an enum). The request parser rejects any other field.
+  - Question text and vendor responses come from the server's sample data.
+  - All of it is passed as data inside tags, with `<` escaped so data cannot close a tag. The system prompt says the data is not instructions.
+- **Demo mode** switches on automatically when:
+  - there is no key;
+  - the per-IP limit or the daily cap is hit;
+  - Anthropic returns 429 or 402 (`billing_error`, credit exhausted);
+  - Anthropic is unavailable (5xx/529/connection after one SDK retry).
+
+  The analyst can also request it. Demo output says when the analyst's IRA answers differ from the ones it was made for.
+- **Other failures** (refusal, `max_tokens`, invalid JSON or schema, other 4xx) return a generic error with a "use the saved demo" option. Model output is never shown unvalidated.
+- **Limits (`lib/ai/limits.ts`):** 5 live calls per IP per hour, 100 live calls per UTC day, and an 8 KB request body cap.
+- **Logging:** one JSON line per call with the outcome and the Anthropic request ID. No request or response text.
+- **`scripts/record-demo.ts` (`npm run record-demo`):** records a real model run over the sample and validates it before saving it as the demo output.
+- **Tests:** 48 passing (15 new).
+  - Validator: dropped IDs, duplicates, missing rows, truncation, inconsistencies.
+  - Schema: uses only supported features.
+  - Request parser: rejects extra fields and vendor text.
+  - Prompt: escaping.
+  - Live vs demo: every demo reason.
+  - Error paths: refusal, `max_tokens`, invalid JSON.
+  - Limiter: window and day reset.
+  - Logs: carry no text.
+
+### Decisions (defaults, open to change)
+- **The demo output is a placeholder written by the developer (`source.kind: "mock"`) until the key is set.**
+  - It is not model output, and the response says so.
+  - It matches the back-test reading: DDQ-11 Gap; DDQ-03, 18 and 23 Needs evidence; conflicts on IRA-13 and IRA-12; inconsistencies IRA-07/08 and IRA-03/14.
+  - It will be replaced by a recorded model run (`npm run record-demo`) and reviewed before commit.
+- **Rate limit and daily cap are in-memory, per server instance.** On Vercel, separate instances do not share counts, and counts reset when an instance restarts. The real budget cap is the prepaid Anthropic credit with auto-reload off. The README will say so.
+- **Anthropic 429, 402 and outages fall back to demo**, so a visitor always sees a working flow, clearly labelled. Other errors are shown as errors, so the guardrail is visible.
+- **Questionnaire responses are not editable in v1.** A blank "new vendor" intake is in the v2 backlog, so the only analyst input to the model is the IRA answer enum.
