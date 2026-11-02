@@ -23,6 +23,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/rules" className="text-stone-600 hover:text-stone-900">
               Rules
             </Link>
+            <Link href="/about" className="text-stone-600 hover:text-stone-900">
+              About
+            </Link>
+            <Link href="/content-notice" className="text-stone-600 hover:text-stone-900">
+              Content notice
+            </Link>
           </nav>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-8 print:max-w-none print:p-0">{children}</main>

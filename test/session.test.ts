@@ -4,7 +4,7 @@ import { REASON_MAX, STATE_VERSION, createFromSample, parseState, setIraAnswer }
 import { SAMPLES } from "../lib/sample.ts";
 import { assessInherent, describeChange } from "../lib/ira.ts";
 
-const sample = SAMPLES["v1-deloitte"]!;
+const sample = SAMPLES["v1-halden"]!;
 const fresh = () => createFromSample(sample, "2026-11-02");
 const AT = "2026-11-02T18:00:00.000Z";
 

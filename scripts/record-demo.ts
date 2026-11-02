@@ -9,7 +9,7 @@ import { REVIEW_SYSTEM_PROMPT, buildReviewUserMessage } from "../lib/ai/prompt.t
 import { REVIEW_SCHEMA, validateReview } from "../lib/ai/schema.ts";
 import { IRA_QUESTIONS, SAMPLES } from "../lib/sample.ts";
 
-const sampleId = process.argv[2] ?? "v1-deloitte";
+const sampleId = process.argv[2] ?? "v1-halden";
 const sample = SAMPLES[sampleId];
 if (!sample) throw new Error(`Unknown sample ${sampleId}`);
 if (!apiKeyPresent()) throw new Error("ANTHROPIC_API_KEY is not set (use --env-file=.env.local).");

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ANSWER_RATINGS, RULES, UNKNOWN_RATING } from "@/config/rules.ts";
 import { assessInherent } from "@/lib/ira.ts";
 import { Badge } from "@/components/Badge.tsx";
+import { FICTIONAL_VENDOR, VENDOR_DISCLAIMER } from "@/lib/sample.ts";
 import v1 from "@/data/v1-vendor.json";
 
 export const metadata: Metadata = { title: "Rules · TPRA" };
@@ -30,11 +31,11 @@ export default function RulesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">IRA answers and the v1 back-test ({v1.vendor})</h2>
+        <h2 className="text-xl font-semibold">IRA answers and the v1 back-test ({FICTIONAL_VENDOR})</h2>
         <p className="max-w-2xl text-sm text-stone-700">
           Answers are from the manual v1 assessment. &ldquo;Unknown&rdquo; always rates {UNKNOWN_RATING} and opens a
-          follow-up. Vendor responses are illustrative and were written for this portfolio. They are not Deloitte&apos;s
-          actual responses and make no statement about Deloitte&apos;s security practices.
+          follow-up.
+          {VENDOR_DISCLAIMER}
         </p>
         <div className="overflow-x-auto rounded border border-stone-200 bg-white">
           <table className="w-full text-left text-sm">

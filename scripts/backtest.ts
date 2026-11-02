@@ -1,4 +1,4 @@
-// Prints the back-test of the rules against the v1 Deloitte sample: `npm run backtest`.
+// Prints the back-test of the rules against the v1 sample (Halden Advisory): `npm run backtest`.
 // The expected DDQ ratings below are Claude's reading for the back-test only, not AI output and
 // not Bernadette's decisions. In the app, the AI proposes and the analyst confirms each row.
 import { readFileSync } from "node:fs";

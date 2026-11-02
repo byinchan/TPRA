@@ -62,7 +62,7 @@ export function parseReviewRequest(body: unknown): ReviewRequest | null {
   return { sampleId: body.sampleId, ira, demo: body.demo === true };
 }
 
-const known = () => ({ iraIds: IRA_IDS, ddqIds: SAMPLES["v1-deloitte"]!.ddq.map((r) => r.id) });
+const known = () => ({ iraIds: IRA_IDS, ddqIds: SAMPLES["v1-halden"]!.ddq.map((r) => r.id) });
 
 export function demoReview(req: ReviewRequest, reason: DemoReason): ReviewResult {
   const saved = DEMO_REVIEWS[req.sampleId];

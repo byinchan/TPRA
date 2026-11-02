@@ -8,7 +8,7 @@ import { buildFacts, factsFingerprint } from "../lib/report/facts.ts";
 import { SAMPLES } from "../lib/sample.ts";
 import { createFromSample, type AssessmentState } from "../lib/session.ts";
 
-export async function standardDemoState(sampleId = "v1-deloitte"): Promise<AssessmentState> {
+export async function standardDemoState(sampleId = "v1-halden"): Promise<AssessmentState> {
   const sample = SAMPLES[sampleId]!;
   const at = "2026-11-02T00:00:00.000Z";
   const r = await runReview(
