@@ -3,10 +3,10 @@ import Link from "next/link";
 const STEPS = [
   { label: "Intake & inherent risk", href: "/" },
   { label: "Due diligence review", href: "/review" },
-  { label: "Findings & report", href: null },
+  { label: "Findings & report", href: "/report" },
 ] as const;
 
-/** Workflow position. Steps link once an assessment is loaded; screen 3 arrives in a later pull request. */
+/** Workflow position. Steps link once an assessment is loaded. */
 export function Steps({ current, loaded = false }: { current: 1 | 2 | 3; loaded?: boolean }) {
   return (
     <ol className="flex flex-wrap gap-2 text-sm">

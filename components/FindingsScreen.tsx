@@ -1,0 +1,321 @@
+"use client";
+// Screen 3 (part a): findings and the calculated outcome. Code computes; the analyst sets owner, due date, status.
+import Link from "next/link";
+import { useEffect, useId, useState } from "react";
+import { closeFinding, reopenFinding, setDueDate, setOwner, type Finding } from "@/lib/findings.ts";
+import { computeOutcome } from "@/lib/outcome.ts";
+import { SAMPLES } from "@/lib/sample.ts";
+import { DEFAULT_OWNER, OWNER_MAX, REASON_MAX, type AssessmentState } from "@/lib/session.ts";
+import { FIPPA } from "@/config/rules.ts";
+import { Badge, LevelPill } from "./Badge.tsx";
+import { Steps } from "./Steps.tsx";
+import { useAssessment } from "./useAssessment.ts";
+
+const now = () => new Date().toISOString();
+
+const DECISION_STYLES: Record<string, string> = {
+  Approve: "border-emerald-300 bg-emerald-50 text-emerald-900",
+  "Approve with conditions": "border-amber-300 bg-amber-50 text-amber-950",
+  "Escalate - do not approve yet": "border-red-300 bg-red-50 text-red-900",
+};
+
+export function FindingsScreen() {
+  const { state, ready, update } = useAssessment();
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  if (!ready) return <p className="text-sm text-stone-500">Loading…</p>;
+  if (!state) {
+    return (
+      <div className="space-y-6">
+        <Steps current={3} />
+        <div className="max-w-xl space-y-3 rounded border border-stone-200 bg-white p-6">
+          <h1 className="text-2xl font-semibold">Findings & report</h1>
+          <p className="text-stone-700">Start on screen 1: load the sample vendor first.</p>
+          <Link href="/" className="inline-block rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white">
+            ← Go to intake & inherent risk
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const s = state;
+  const sample = SAMPLES[s.sampleId]!;
+  const o = computeOutcome(s);
+
+  function apply(fn: (st: AssessmentState) => AssessmentState) {
+    try {
+      setActionError(null);
+      update(fn(s));
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : "That change could not be applied.");
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <Steps current={3} loaded />
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold">Findings & report</h1>
+        <p className="text-stone-700">
+          <span className="font-medium">{sample.vendor}</span> · {sample.service} · assessed {s.assessedOn}
+        </p>
+        <p className="max-w-3xl text-xs text-stone-500">{sample.disclaimer}</p>
+      </header>
+
+      {actionError && (
+        <p role="alert" className="rounded border border-red-300 bg-red-50 p-3 text-sm">
+          {actionError}
+        </p>
+      )}
+
+      <section aria-label="Calculated outcome" className="space-y-4 rounded border border-sky-200 bg-sky-50 p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-600">Calculated outcome</h2>
+          <Badge kind="Code" />
+        </div>
+
+        {o.recommendation ? (
+          <div className={`rounded border p-3 ${DECISION_STYLES[o.recommendation.decision]}`}>
+            <p className="text-xs uppercase opacity-70">Recommendation</p>
+            <p className="text-xl font-semibold">{o.recommendation.decision}</p>
+            <p className="text-sm">{o.recommendation.reason}</p>
+          </div>
+        ) : (
+          <div className="space-y-2 rounded border border-stone-300 bg-white p-3 text-sm">
+            <p className="font-medium">Residual risk and the recommendation are not available yet.</p>
+            <ul className="list-disc pl-5 text-stone-700">
+              {o.blockers.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+            <Link href="/review" className="inline-block text-sky-700 underline">
+              Go to due diligence review →
+            </Link>
+          </div>
+        )}
+
+        <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="text-xs uppercase text-stone-500">Inherent risk</dt>
+            <dd className="flex items-center gap-2">
+              <LevelPill level={o.inherent.level} /> {o.tier.label}
+            </dd>
+            <dd className="mt-1 text-xs text-stone-600">{o.inherent.reason}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-stone-500">Control strength</dt>
+            <dd className="font-medium">{o.strength.strength ?? "Not assessed"}</dd>
+            <dd className="mt-1 text-xs text-stone-600">
+              {o.strength.reason} ({o.confirmedRows}/{o.totalRows} rows confirmed)
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-stone-500">Residual risk</dt>
+            {o.residual ? (
+              <>
+                <dd className="flex items-center gap-2">
+                  <LevelPill level={o.residual.level} />
+                  {o.residual.provisional && <span className="text-xs font-medium text-orange-800">Provisional</span>}
+                </dd>
+                <dd className="mt-1 text-xs text-stone-600">{o.residual.reason}</dd>
+              </>
+            ) : (
+              <dd className="text-stone-500">Not available yet</dd>
+            )}
+          </div>
+          <div>
+            <dt className="text-xs uppercase text-stone-500">Next review</dt>
+            <dd className="font-medium">{o.nextReview ?? "At contract renewal"}</dd>
+            <dd className="mt-1 text-xs text-stone-600">
+              {o.tier.cadence}, from the assessment date ({s.assessedOn}).
+            </dd>
+          </div>
+        </dl>
+
+        <p className="text-sm">
+          <span className="text-xs uppercase text-stone-500">FIPPA flag: </span>
+          {o.fippa.triggered ? (
+            <span className="font-medium text-red-800">{FIPPA.message}</span>
+          ) : (
+            <span>{o.fippa.reason}</span>
+          )}{" "}
+          <span className="text-xs text-stone-500">{FIPPA.notLegalAdvice}</span>
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-baseline gap-2">
+          <h2 className="text-lg font-semibold">Findings ({o.findings.length})</h2>
+          <span className="text-sm text-stone-600">{o.openFindings} open</span>
+          <span className="ml-auto flex gap-1 text-xs">
+            <Badge kind="Code">Code lists them</Badge>
+            <Badge kind="Analyst">Analyst sets owner, due date, status</Badge>
+          </span>
+        </div>
+        <p className="text-sm text-stone-600">
+          Every open follow-up, every confirmed Gap or Needs evidence row and a triggered FIPPA flag becomes a finding.
+          Rows still awaiting review are not included.
+        </p>
+        {o.findings.length === 0 ? (
+          <p className="rounded border border-stone-200 bg-white p-4 text-sm text-stone-600">No findings.</p>
+        ) : (
+          <ul className="space-y-3">
+            {o.findings.map((f) => (
+              <FindingCard key={f.id} finding={f} apply={apply} />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <p className="rounded border border-dashed border-stone-300 p-4 text-sm text-stone-600">
+        The executive summary (AI-drafted narrative, analyst-edited and approved) and the PDF and Excel downloads arrive
+        in the next pull requests.
+      </p>
+      <p className="text-xs text-stone-500">
+        Saved only in this browser tab. Closing the tab erases the assessment; nothing is stored on a server.
+      </p>
+    </div>
+  );
+}
+
+function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: AssessmentState) => AssessmentState) => void }) {
+  const uid = useId();
+  const [owner, setOwnerText] = useState(f.owner);
+  const [closing, setClosing] = useState(false);
+  const [note, setNote] = useState("");
+  useEffect(() => setOwnerText(f.owner), [f.owner]);
+  const sourceHref = f.source === "Due diligence" ? `/review#${f.sourceRow}` : f.source === "IRA follow-up" ? "/review" : "/";
+
+  return (
+    <li className={`rounded border bg-white p-3 ${f.status === "Closed" ? "border-stone-200 opacity-75" : "border-stone-300"}`}>
+      <div className="flex flex-wrap items-start gap-2">
+        <span className="font-mono text-xs text-stone-500">{f.id}</span>
+        <span
+          className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+            f.kind === "Gap" || f.kind === "FIPPA"
+              ? "bg-red-50 text-red-800"
+              : f.kind === "Needs evidence"
+                ? "bg-amber-50 text-amber-900"
+                : "bg-stone-100 text-stone-700"
+          }`}
+        >
+          {f.kind}
+        </span>
+        <p className="min-w-0 flex-1 basis-60 text-sm font-medium">{f.title}</p>
+        <span
+          className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+            f.status === "Open" ? "bg-orange-100 text-orange-800" : "bg-emerald-100 text-emerald-800"
+          }`}
+        >
+          {f.status}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-stone-500">
+        Source: {f.source},{" "}
+        <Link href={sourceHref} className="underline">
+          {f.sourceRow}
+        </Link>
+      </p>
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-end">
+        <div>
+          <label htmlFor={`${uid}-owner`} className="block text-xs text-stone-600">
+            Owner
+          </label>
+          <input
+            id={`${uid}-owner`}
+            value={owner}
+            maxLength={OWNER_MAX}
+            placeholder={DEFAULT_OWNER}
+            onChange={(e) => setOwnerText(e.target.value)}
+            onBlur={() => owner.trim() !== f.owner && apply((s) => setOwner(s, f.id, owner, now()))}
+            className="w-full rounded border border-stone-300 px-2 py-1 text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor={`${uid}-due`} className="block text-xs text-stone-600">
+            Due date
+          </label>
+          <input
+            id={`${uid}-due`}
+            type="date"
+            value={f.dueDate ?? ""}
+            onChange={(e) => apply((s) => setDueDate(s, f.id, e.target.value || null, now()))}
+            className="rounded border border-stone-300 px-2 py-1 text-sm"
+          />
+        </div>
+        <div>
+          {f.status === "Closed" ? (
+            <button
+              type="button"
+              onClick={() => apply((s) => reopenFinding(s, f.id, now()))}
+              className="rounded border border-stone-300 px-3 py-1 text-sm hover:bg-stone-100"
+            >
+              Reopen
+            </button>
+          ) : f.closable ? (
+            <button
+              type="button"
+              onClick={() => setClosing(true)}
+              className="rounded border border-stone-300 px-3 py-1 text-sm hover:bg-stone-100"
+            >
+              Close…
+            </button>
+          ) : (
+            <Link href="/review" className="text-xs text-sky-700 underline">
+              Resolve on screen 2
+            </Link>
+          )}
+        </div>
+      </div>
+      {!f.dueDate && f.status === "Open" && <p className="mt-1 text-xs text-orange-800">No due date set.</p>}
+
+      {closing && f.status === "Open" && (
+        <div className="mt-2 space-y-2 rounded border border-stone-300 bg-stone-50 p-2">
+          <label htmlFor={`${uid}-note`} className="block text-xs font-medium">
+            How was this resolved? (required)
+          </label>
+          <input
+            id={`${uid}-note`}
+            value={note}
+            maxLength={REASON_MAX}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="e.g. Certificate received and checked on 2026-11-10"
+            className="w-full rounded border border-stone-300 px-2 py-1 text-sm"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={!note.trim()}
+              onClick={() => {
+                apply((s) => closeFinding(s, f, note, now()));
+                setClosing(false);
+                setNote("");
+              }}
+              className="rounded bg-stone-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            >
+              Close finding
+            </button>
+            <button type="button" onClick={() => setClosing(false)} className="px-3 py-1 text-xs">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {f.status === "Closed" && f.closeNote && <p className="mt-1 text-xs text-stone-700">Closed: {f.closeNote}</p>}
+      {f.history.length > 0 && (
+        <details className="mt-2 text-xs">
+          <summary className="cursor-pointer text-stone-600">History ({f.history.length})</summary>
+          <ol className="mt-1 space-y-0.5 border-l-2 border-stone-200 pl-3 text-stone-700">
+            {f.history.map((h, i) => (
+              <li key={`${h.at}-${i}`}>
+                <time dateTime={h.at}>{new Date(h.at).toLocaleString()}</time> · {h.detail}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
+    </li>
+  );
+}

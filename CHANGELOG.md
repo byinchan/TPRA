@@ -244,3 +244,41 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **No "confirm all" button:** each row is confirmed on its own, which is the point of the human review.
 - **Text edits are saved when the field loses focus**, so history records edits rather than keystrokes.
 - **Inconsistency flags are advisory:** they never change an answer on their own.
+
+## PR 6: screen 3a, findings, residual risk, recommendation (2026-11-02)
+
+### Added
+- **Screen 3 at `/report`, Calculated outcome (Code):**
+  - Recommendation with its reason.
+  - Inherent risk + tier + rule.
+  - Control strength + rule (with confirmed count).
+  - Residual risk + rule + "Provisional" flag.
+  - Next review date with cadence.
+  - FIPPA status (not legal advice).
+- **Findings (Code lists them; the Analyst sets owner, due date, status):**
+  - **Sources:** every open IRA follow-up, every confirmed Gap / Needs evidence row, and a triggered FIPPA flag.
+  - **Defaults:** owner "Vendor owner (to assign)" and no due date, flagged as "No due date set".
+  - **Closing:** requires a note. Reopen is allowed, and history records owner, due date, close and reopen.
+  - **Links:** each finding links to its source row.
+- **`lib/outcome.ts` `computeOutcome(state)`:** the single pure function behind screen 3. The report, PDF and Excel export will use it too. It includes the code-written recommendation line for the report.
+- **`lib/findings.ts`:** each finding has an explicit `kind` (Follow-up / Gap / Needs evidence / FIPPA), plus `withDetails`, `setOwner`, `setDueDate`, `closeFinding` and `reopenFinding`.
+- **Session state is now version 3** (`tpra.assessment.v3`) with analyst finding details.
+  - Each detail is validated on load: ID pattern, owner length, real dates, and a closed status needs a note.
+  - Duplicate IDs are rejected.
+- **Navigation:** screen 2 has "Continue to findings & report", and the step pill for screen 3 is now a link.
+- **Tests:** 64 passing. 8 are new end-to-end outcome tests through the real workflow functions:
+  - Blocked until all rows are confirmed.
+  - The v1 back-test: Medium / Adequate / Medium (provisional) / Approve with conditions / 6 findings / 2028-11-02.
+  - IRA-13 → Yes gives Escalate.
+  - Closing everything gives Approve.
+  - Follow-ups can't be closed by hand.
+  - FIPPA blocks Approve.
+  - Owner and due date are recorded and survive storage.
+  - Re-rating a row removes its finding.
+
+### Decisions (defaults, open to change)
+- **Residual risk and the recommendation appear only once all 26 rows are confirmed.** Until then, the screen lists what is blocking them. A recommendation built on partly reviewed data would contradict "only confirmed rows count".
+- **IRA follow-up findings close only by resolving the IRA answer** (screen 2, with a note), never by hand. This keeps the finding and the inherent risk answer consistent.
+- **"Provisional" lasts while any Needs-evidence finding is open.** Closing one (e.g. "certificate received") clears it. The row's rating stays as confirmed, so control strength does not change.
+- **Due dates are optional for now.** The report-approval PR can require them; that is Bernadette's call.
+- **Consequence of the confirmed rules, for Bernadette to note:** resolving IRA-13 to Yes from DDQ-11 makes Deloitte High inherent with Adequate controls. That gives High residual risk, so the recommendation is **Escalate - do not approve yet**. A test now locks this in.
