@@ -7,6 +7,8 @@ import { inflateRawSync } from "node:zlib";
 
 const root = new URL("../", import.meta.url);
 const data = JSON.parse(readFileSync(new URL("data/v1-vendor.json", root), "utf8"));
+// The verbatim checks cover the 15 original v1 rows only; IRA-16 was added after v1.
+const v1Ira = data.ira.filter((r) => !r.addedAfterV1);
 
 function readZipEntry(path, name) {
   const buf = readFileSync(new URL(path, root));
@@ -34,15 +36,27 @@ const unescape = (s) =>
   s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
 
 test("row counts and stable IDs", () => {
-  assert.equal(data.ira.length, 15);
+  assert.equal(v1Ira.length, 15);
+  assert.equal(data.ira.length, 16);
   assert.equal(data.ddq.length, 26);
   data.ira.forEach((r, i) => assert.equal(r.id, `IRA-${String(i + 1).padStart(2, "0")}`));
   data.ddq.forEach((r, i) => assert.equal(r.id, `DDQ-${String(i + 1).padStart(2, "0")}`));
 });
 
-test("IRA: 5 areas x 3 questions, allowed values only", () => {
+test("IRA-16 is the only post-v1 row and is marked as such", () => {
+  const added = data.ira.filter((r) => r.addedAfterV1);
+  assert.deepEqual(added.map((r) => r.id), ["IRA-16"]);
+  const [r] = added;
+  assert.equal(r.question, "Will employee or other personal information be shared?");
+  assert.equal(r.area, "Data");
+  assert.equal(r.answer, "No");
+  assert.equal(r.v1Rating, null);
+  assert.match(r.note, /^Added after v1, not in the manual assessment\./);
+});
+
+test("IRA: 5 areas x 3 questions in v1, allowed values only", () => {
   const areas = ["Data", "System Access", "Service Criticality", "Technology", "Regulatory"];
-  data.ira.forEach((r, i) => {
+  v1Ira.forEach((r, i) => {
     assert.equal(r.area, areas[Math.floor(i / 3)]);
     assert.ok(["Yes", "No", "Unknown"].includes(r.answer), r.id);
     assert.ok(["Low", "Medium", "High"].includes(r.v1Rating), r.id);
@@ -78,7 +92,7 @@ test("IRA wording matches the v1 workbook exactly", () => {
   assert.equal(cell("B1"), data.vendor);
   assert.equal(cell("B2"), data.service);
   assert.equal(cell("B4"), data.v1Labels.overallInherentRisk);
-  data.ira.forEach((r, i) => {
+  v1Ira.forEach((r, i) => {
     const row = 11 + i;
     assert.deepEqual(
       [cell(`A${row}`), cell(`B${row}`), cell(`C${row}`), cell(`D${row}`)],

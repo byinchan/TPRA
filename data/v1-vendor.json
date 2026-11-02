@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "source": {
     "note": "Extracted verbatim from the author's manual v1 assessment in /v1. Wording is not edited.",
     "files": {
@@ -20,105 +20,129 @@
       "area": "Data",
       "question": "Will confidential information be shared?",
       "answer": "Yes",
-      "v1Rating": "High"
+      "v1Rating": "High",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-02",
       "area": "Data",
       "question": "Will customer PII be accessed?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-03",
       "area": "Data",
       "question": "Will regulated information be processed?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-04",
       "area": "System Access",
       "question": "Will the vendor access internal systems?",
       "answer": "Yes",
-      "v1Rating": "Medium"
+      "v1Rating": "Medium",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-05",
       "area": "System Access",
       "question": "Will the vendor require privileged access?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-06",
       "area": "System Access",
       "question": "Will the vendor connect to the corporate network?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-07",
       "area": "Service Criticality",
       "question": "Is this a business-critical service?",
       "answer": "Yes",
-      "v1Rating": "High"
+      "v1Rating": "High",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-08",
       "area": "Service Criticality",
       "question": "Would an outage significantly impact operations?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-09",
       "area": "Service Criticality",
       "question": "Is there an alternate vendor available?",
       "answer": "Yes",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-10",
       "area": "Technology",
       "question": "Will the vendor host company data?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-11",
       "area": "Technology",
       "question": "Will cloud services be used?",
       "answer": "No",
-      "v1Rating": "Low"
+      "v1Rating": "Low",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-12",
       "area": "Technology",
       "question": "Will subcontractors be involved?",
       "answer": "Unknown",
-      "v1Rating": "Medium"
+      "v1Rating": "Medium",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-13",
       "area": "Regulatory",
       "question": "Will data leave the country?",
       "answer": "Unknown",
-      "v1Rating": "Medium"
+      "v1Rating": "Medium",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-14",
       "area": "Regulatory",
       "question": "Are regulatory requirements applicable?",
       "answer": "Yes",
-      "v1Rating": "Medium"
+      "v1Rating": "Medium",
+      "addedAfterV1": false
     },
     {
       "id": "IRA-15",
       "area": "Regulatory",
       "question": "Is sensitive intellectual property involved?",
       "answer": "Yes",
-      "v1Rating": "High"
+      "v1Rating": "High",
+      "addedAfterV1": false
+    },
+    {
+      "id": "IRA-16",
+      "area": "Data",
+      "question": "Will employee or other personal information be shared?",
+      "answer": "No",
+      "v1Rating": null,
+      "addedAfterV1": true,
+      "note": "Added after v1, not in the manual assessment. Answer set by the author on 2026-11-02."
     }
   ],
   "ddq": [
