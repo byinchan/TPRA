@@ -21,14 +21,14 @@ The company (Pacific Utilities Corporation, PUC) and the vendor (Halden Advisory
 - Three screens in the order a real assessment runs: intake and inherent risk (the tier sets how deep due diligence goes), due diligence review, findings and report.
 - AI suggestions for 26 questionnaire responses, each confirmed by the analyst.
 - Fixed, visible rules for inherent risk, tier, residual risk, recommendation and a BC privacy (FIPPA) flag, back-tested against my manual assessment.
-- Findings with owners, due dates and history, and an approved report as PDF and Excel.
+- Findings with owners and due dates, and an approved report as PDF and Excel.
 
 ## Where AI helps, and where it stops
 **AI suggests:** a rating (Satisfactory, Gap, Needs evidence) and one-line rationale per questionnaire response, conflicts with the intake answers, inconsistencies inside the intake answers, evidence to request, and the report narrative.
 
 **The analyst decides:** every row is edited and confirmed by the analyst. An override needs a reason. Only confirmed rows count. The analyst also assigns owners and due dates, names the preparer and approves the report.
 
-**Deterministic logic calculates:** inherent risk, tier, review cadence, control strength, residual risk, the recommendation, findings, review dates, and every number in the report and workbook. The AI never produces a rating, tier or decision, and it can only refer to row IDs that exist; unknown IDs are dropped and counted.
+**Deterministic logic calculates:** inherent risk, tier, review cadence, control strength, residual risk, the recommendation, findings, review dates, and every number in the report and workbook. The AI never produces a rating, tier or decision, and unknown row IDs it cites are dropped and counted.
 
 ### A real example of the guardrails
 In the sample, IRA-13 (will data leave Canada?) is "Unknown", so inherent risk is Medium, Tier 2, and an open follow-up is created. If the analyst resolves it to "Yes" from the vendor's questionnaire answer, a fourth High answer tips inherent risk to High and Tier 1. The screen shows the rule that caused the change, adequate controls then leave residual risk High, and the recommendation becomes "Escalate - do not approve yet". That means a risk owner decides whether to accept the risk; it does not mean the vendor is rejected. The AI proposed none of this; the rules did, and the change history records it.
@@ -41,7 +41,7 @@ The report has a second guardrail: before approval, a number check compares ever
 <!-- ![Due diligence review](docs/screenshots/02-review.png) -->
 *Screenshot to add: due diligence review with AI suggestions (docs/screenshots/02-review.png).*
 
-**2. Due diligence review.** The AI suggests a rating, rationale, conflict and evidence request for each response. Rows are badged AI-suggested, Human-edited or Confirmed, and unconfirmed rows show "Awaiting review". The analyst can resolve an intake follow-up from a questionnaire answer, with a note, which updates the answer and re-scores.
+**2. Due diligence review.** The AI suggests a rating, rationale, conflict and evidence request for each response. Rows are badged AI-suggested, Human-edited or Confirmed. The analyst can resolve an intake follow-up from a questionnaire answer, with a note, which updates the answer and re-scores.
 
 <!-- ![Findings and report](docs/screenshots/03-findings.png) -->
 *Screenshot to add: findings, residual risk and recommendation (docs/screenshots/03-findings.png).*
@@ -51,7 +51,7 @@ The report has a second guardrail: before approval, a number check compares ever
 ## Executive reporting
 The one-to-two page report leads with a code-written recommendation line, then covers scope, inherent risk and tier, due diligence results, findings and conditions, residual risk and next review date, and method and limitations. The AI writes the narrative from confirmed data only and the analyst edits every section. The report states what it does not show: no evidence files were reviewed and no on-site assessment was done.
 
-Approval needs a clean number check, a due date on every open finding and a named preparer. After approval, **Download PDF** uses the browser's print layout (Save as PDF) and **Download Excel** produces a workbook generated in the browser with five tabs: Summary, Inherent Risk, Due Diligence, Findings and an Audit trail. Both are disabled again if anything changes after approval.
+Approval needs a clean number check, a due date on every open finding and a named preparer. After approval, **Download PDF** uses the browser's print layout (Save as PDF) and **Download Excel** produces a workbook generated in the browser with five tabs: Summary, Inherent Risk, Due Diligence, Findings and an Audit trail.
 
 <!-- ![Executive report](docs/screenshots/04-report.png) -->
 *Screenshot to add: the approved executive report (docs/screenshots/04-report.png).*
@@ -90,7 +90,7 @@ No authentication, database, durable persistence, vendor portal, integrations, c
 - A blank "new vendor" intake, so the tool is not limited to a sample.
 - A second, higher-risk sample (Northbridge Billing Systems, a fictional customer billing SaaS) to show a different tier and outcome under the same rules.
 - An OT/SCADA software vendor with NERC CIP-013-aligned supplier checks.
-- Evidence file uploads, contract clause review, and reassessment reminders.
+- Evidence file uploads and contract clause review.
 
 ## Closing reflection
 The most useful design decision was the split: AI for reading and drafting, code for anything that has to be defensible. It made the tool easier to trust and to test, and it kept the judgment calls with the analyst. The guardrails turned out to be the interesting part: a number check, a visible rule and a required reason are what let a reviewer rely on a model's suggestion.
