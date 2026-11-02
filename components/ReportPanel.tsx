@@ -23,6 +23,7 @@ import { computeOutcome } from "@/lib/outcome.ts";
 import { SAMPLES } from "@/lib/sample.ts";
 import { PREPARER_MAX, type AssessmentState } from "@/lib/session.ts";
 import { Badge } from "./Badge.tsx";
+import { downloadWorkbook } from "@/lib/export/download.ts";
 import { ReportDocument } from "./ReportDocument.tsx";
 
 const now = () => new Date().toISOString();
@@ -228,6 +229,7 @@ export function ReportPanel({ state, apply }: { state: AssessmentState; apply: (
 
       <PrintBlock
         status={status}
+        state={state}
         doc={
           <ReportDocument
             facts={facts}
@@ -298,7 +300,20 @@ function SectionEditor({
 }
 
 /** Preview, page-fit measurement and print. Print shows only the report (see globals.css). */
-function PrintBlock({ doc, status }: { doc: React.ReactNode; status: "approved" | "void" | "none" }) {
+function PrintBlock({ doc, status, state }: { doc: React.ReactNode; status: "approved" | "void" | "none"; state: AssessmentState }) {
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  async function onExcel() {
+    setExporting(true);
+    setExportError(null);
+    try {
+      await downloadWorkbook(state);
+    } catch {
+      setExportError("The Excel file could not be created. Try again.");
+    } finally {
+      setExporting(false);
+    }
+  }
   const measure = useRef<HTMLDivElement>(null);
   const [pages, setPages] = useState<number | null>(null);
   useLayoutEffect(() => {
@@ -323,8 +338,22 @@ function PrintBlock({ doc, status }: { doc: React.ReactNode; status: "approved" 
         >
           Download PDF
         </button>
+        <button
+          type="button"
+          disabled={status !== "approved" || exporting}
+          onClick={onExcel}
+          className="rounded border border-stone-900 bg-white px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+          title={status === "approved" ? "Downloads the assessment workbook (.xlsx)" : "Approve the report first"}
+        >
+          {exporting ? "Preparing…" : "Download Excel"}
+        </button>
       </div>
-      {status !== "approved" && <p className="text-xs text-stone-500 print:hidden">Download PDF is available once the report is approved.</p>}
+      {exportError && (
+        <p role="alert" className="text-sm text-red-700 print:hidden">
+          {exportError}
+        </p>
+      )}
+      {status !== "approved" && <p className="text-xs text-stone-500 print:hidden">Download PDF and Download Excel are available once the report is approved.</p>}
       <div id="print-report" className="rounded border border-stone-300 bg-white p-6 shadow-sm print:rounded-none print:border-0 print:p-0 print:shadow-none">
         {doc}
       </div>
