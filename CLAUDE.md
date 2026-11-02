@@ -25,7 +25,12 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
 - Extract the 15 IRA questions (5 areas: Data, System Access, Service Criticality, Technology,
   Regulatory) with their answers and my per-question ratings, and the 26 questionnaire questions
   (8 domains) with the vendor responses, into data/v1-vendor.json. Copy wording exactly from /v1;
-  do not invent or "improve" answers. Give stable IDs (IRA-01..IRA-15, DDQ-01..DDQ-26).
+  do not invent or "improve" answers. Give stable IDs (IRA-01..IRA-15, DDQ-01..DDQ-26); IRA-16
+  is the one question added after v1 (see below).
+- IRA-16 (CONFIRMED, added after v1): "Will employee or other personal information be shared?"
+  Area: Data. Yes = High, No = Low. Deloitte answer: No. It is NOT in the manual assessment: mark it
+  in the data and the UI as "added after v1, not in the manual assessment". The verbatim v1 test
+  covers the original 15 rows only.
 - My v1 overall inherent rating is Medium. Keep it as the back-test target.
 - VENDOR DISCLAIMER (verbatim, on the intake screen, in the report footer and in the README):
   "Vendor responses are illustrative and were written for this portfolio. They are not Deloitte's
@@ -35,7 +40,8 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
 - Vendor: Northbridge Billing Systems (FICTIONAL). Service: cloud-hosted customer billing and
   account management platform (SaaS) for PUC's residential and commercial customers.
 - Purpose: show that a higher-risk engagement gets a different tier and outcome, using the SAME
-  15 IRA questions and 26 questionnaire questions and the SAME rules. No new screens or logic.
+  16 IRA questions (15 from v1 + IRA-16) and 26 questionnaire questions and the SAME rules.
+  No new screens or logic.
 - Profile to draft: customer PII = Yes, hosts company data = Yes, cloud = Yes, business-critical
   = Yes, data stored in the US (so the FIPPA flag triggers), subcontractor = US cloud hosting
   provider; mostly mature answers with 2-3 realistic gaps (e.g. SOC 2 report has qualified
@@ -62,7 +68,8 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
   response; generic user-facing errors; log only status and request id, never user text.
 - PDF: print layout (@media print) behind a "Download PDF" button (browser Save as PDF). 1-2 pages.
 - Excel export: the assessment workbook (IRA sheet, Due Diligence sheet, Findings sheet) as .xlsx.
-  If this needs a library, propose the smallest one and wait for my OK.
+  Library (CONFIRMED): write-excel-file (MIT, one dependency: fflate), using its browser build so
+  the workbook is generated client-side. Justify it in the PR that adds it.
 - Tests: node --test. CI runs tests before deploy. Branches + PRs so I review the Vercel preview
   before anything reaches main.
 - Tone: a workflow and governance prototype, not a commercial TPRM platform. The AI suggestion,
@@ -97,10 +104,18 @@ diligence goes), THEN the vendor questionnaire, THEN residual risk and the repor
 
 ## Deterministic rules (pure functions, one config file, shown in the UI)
 AI proposes, human confirms, CODE computes. Never let a model produce a rating, tier or decision.
-ALL thresholds below are DRAFTS: back-test on v1, show me results, and wait for my confirmation.
-- IRA per-question score: Low = 1, Medium = 2, High = 3. "Unknown" = Medium + open follow-up.
-- Inherent risk: High if (any High in Data AND customer PII or regulated info = Yes) or 3+ Highs
-  across 3+ areas with mean >= 2.2; Low if no Highs and mean < 1.5; otherwise Medium.
+ALL rules below are CONFIRMED by Bernadette (2026-11-02). Change them only with her decision, and
+re-run the v1 back-test after any change.
+- IRA answer-to-rating table. "Unknown" = Medium for every question + open follow-up.
+  Yes = High, No = Low: IRA-01, 02, 03, 05, 06, 07, 08, 10, 13, 15, 16
+  Yes = Medium, No = Low: IRA-04, 11, 12, 14
+  Yes = Low, No = Medium: IRA-09 (alternate vendor available)
+  This reproduces all 15 v1 per-question ratings. IRA-13 stays Yes = High: the sample loads it as
+  Unknown (Medium, matches v1); if an analyst resolves it to Yes, the move to High / Tier 1 is
+  intended. When an edit changes the inherent risk or tier, show on screen the rule that caused it.
+- Inherent risk (counts only, no average):
+  High if IRA-02 (customer PII) = Yes or IRA-03 (regulated info) = Yes, or 4+ Highs in total;
+  Low if no Highs and 2 or fewer Mediums; otherwise Medium.
 - Tier: High -> Tier 1 (full SIG + evidence, annual review); Medium -> Tier 2 (SIG Lite,
   review every 2 years); Low -> Tier 3 (basic check, review at renewal).
 - Control strength from confirmed questionnaire rows: Strong = no Gaps and <= 10% Needs evidence;
@@ -109,10 +124,12 @@ ALL thresholds below are DRAFTS: back-test on v1, show me results, and wait for 
   Weak -> one level above (max High). Marked "Provisional" while any Needs evidence row is open.
 - Recommendation: Approve (no open findings) / Approve with conditions (open findings, residual
   not High) / Escalate - do not approve yet (residual High or control strength Weak).
-- BC privacy flag: if data may leave Canada (Yes/Unknown) AND personal information is involved
-  (Yes/Unknown) -> "FIPPA: storage outside Canada - check whether a supplementary assessment is
-  required (confirm with Privacy Office)". If not triggered, show it as checked, not triggered.
-  Not legal advice; say so.
+- BC privacy flag: if data may leave Canada (IRA-13 = Yes/Unknown) AND personal information is
+  involved (IRA-02 or IRA-16 = Yes/Unknown) -> "FIPPA: storage outside Canada - check whether a
+  supplementary assessment is required (confirm with Privacy Office)". If not triggered, show it
+  as checked, not triggered. Not legal advice; say so. A TRIGGERED flag creates an open finding
+  "Confirm with Privacy Office whether a supplementary assessment is required", so the
+  recommendation cannot be "Approve" while it is open.
 - Back-test on the v1 sample: show where the rule disagrees with my v1 labels. Differences are
   for me to decide, not bugs.
 
