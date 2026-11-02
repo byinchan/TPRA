@@ -46,7 +46,7 @@ const row = (s: Awaited<ReturnType<typeof reviewed>>, id: string) => s.ddq.find(
 test("applying the AI review stores each suggestion unchanged; nothing is confirmed yet", async () => {
   const s = await reviewed();
   assert.equal(s.review?.mode, "demo");
-  assert.equal(s.review?.iraInconsistencies.length, 2);
+  assert.equal(s.review?.iraInconsistencies.length, 3);
   assert.ok(s.ddq.every((r) => r.ai && !r.confirmed && r.decision === null));
   assert.deepEqual(rowBadges(row(s, "DDQ-11")), { provenance: "AI-suggested", status: "Awaiting review" });
   assert.deepEqual(confirmedRatings(s), []);
@@ -90,7 +90,7 @@ test("confirming all 26 AI suggestions as-is gives the back-test result: Adequat
   let s = await reviewed();
   for (const r of s.ddq) s = confirmRow(s, r.id, null, AT);
   const st = controlStrength(confirmedRatings(s));
-  assert.deepEqual([st.strength, st.gaps, st.needsEvidence, st.confirmed], ["Adequate", 1, 3, 26]);
+  assert.deepEqual([st.strength, st.gaps, st.needsEvidence, st.confirmed], ["Adequate", 1, 8, 26]);
 });
 
 test("a row with no AI suggestion needs the analyst to choose a rating", async () => {

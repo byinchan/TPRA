@@ -57,18 +57,23 @@ test("v1 back-test end to end: Medium, Adequate, residual Medium (provisional), 
     [
       ["F-IRA-12", "Follow-up"],
       ["F-IRA-13", "Follow-up"],
+      ["F-DDQ-02-NE", "Needs evidence"],
       ["F-DDQ-03-NE", "Needs evidence"],
       ["F-DDQ-11-GAP", "Gap"],
+      ["F-DDQ-14-NE", "Needs evidence"],
+      ["F-DDQ-16-NE", "Needs evidence"],
+      ["F-DDQ-17-NE", "Needs evidence"],
       ["F-DDQ-18-NE", "Needs evidence"],
+      ["F-DDQ-22-NE", "Needs evidence"],
       ["F-DDQ-23-NE", "Needs evidence"],
     ],
   );
-  assert.equal(o.openFindings, 6);
+  assert.equal(o.openFindings, 11);
   assert.equal(o.nextReview, "2028-11-02");
   assert.ok(o.findings.every((f) => f.owner === DEFAULT_OWNER && f.dueDate === null && f.status === "Open"));
   assert.equal(
     o.recommendationLine,
-    "Recommendation: Approve with conditions. Inherent risk Medium (Tier 2), control strength Adequate, residual risk Medium (provisional), 6 open findings.",
+    "Recommendation: Approve with conditions. Inherent risk Medium (Tier 2), control strength Adequate, residual risk Medium (provisional), 11 open findings.",
   );
 });
 
@@ -88,7 +93,7 @@ test("closing every finding leads to Approve; reopening the Gap goes back to con
   let s = await reviewedAndConfirmed();
   s = resolveFollowUp(s, "IRA-12", "No", "DDQ-23", "No subcontractors per engagement letter", AT);
   s = resolveFollowUp(s, "IRA-13", "No", "DDQ-11", "Contract clause: PUC data stays in Canada", AT);
-  for (const id of ["F-DDQ-03-NE", "F-DDQ-18-NE", "F-DDQ-23-NE"]) {
+  for (const id of ["F-DDQ-02-NE", "F-DDQ-03-NE", "F-DDQ-14-NE", "F-DDQ-16-NE", "F-DDQ-17-NE", "F-DDQ-18-NE", "F-DDQ-22-NE", "F-DDQ-23-NE"]) {
     s = closeNeedsEvidence(s, finding(s, id), "Satisfactory", "Document received and reviewed", AT);
   }
   s = closeFinding(s, finding(s, "F-DDQ-11-GAP"), "Residency clause signed", AT);
@@ -97,7 +102,7 @@ test("closing every finding leads to Approve; reopening the Gap goes back to con
   assert.equal(o.residual!.provisional, false);
   assert.equal(o.recommendation!.decision, "Approve");
   // Every closed finding stays listed for traceability.
-  assert.equal(o.findings.length, 6);
+  assert.equal(o.findings.length, 11);
   assert.ok(o.findings.every((f) => f.status === "Closed"));
   s = reopenFinding(s, finding(s, "F-DDQ-11-GAP"), AT);
   o = computeOutcome(s);
@@ -106,7 +111,7 @@ test("closing every finding leads to Approve; reopening the Gap goes back to con
 
 test("closing Needs evidence re-rates the row with the evidence note as the reason; control strength recalculates", async () => {
   let s = await reviewedAndConfirmed();
-  assert.equal(computeOutcome(s).strength.strength, "Adequate"); // 1 Gap, 3 Needs evidence
+  assert.equal(computeOutcome(s).strength.strength, "Adequate"); // 1 Gap, 8 Needs evidence
   assert.throws(() => closeFinding(s, finding(s, "F-DDQ-03-NE"), "received", AT), /re-rating/);
   assert.throws(() => closeNeedsEvidence(s, finding(s, "F-DDQ-03-NE"), "Satisfactory", " ", AT), /note is required/);
 
@@ -116,7 +121,7 @@ test("closing Needs evidence re-rates the row with the evidence note as the reas
   assert.equal(row.overrideReason, "Evidence: ISO certificate received, scope covers consulting");
   assert.match(row.history.at(-1)!.detail, /^Satisfactory \(AI: Needs evidence\)\. Reason: Evidence: ISO certificate/);
   let o = computeOutcome(s);
-  assert.deepEqual([o.strength.gaps, o.strength.needsEvidence], [1, 2]);
+  assert.deepEqual([o.strength.gaps, o.strength.needsEvidence], [1, 7]);
   const closed = finding(s, "F-DDQ-03-NE");
   assert.deepEqual([closed.status, closed.archived], ["Closed", true]);
   assert.throws(() => reopenFinding(s, closed, AT), /Only a closed Gap or FIPPA/);
@@ -124,7 +129,7 @@ test("closing Needs evidence re-rates the row with the evidence note as the reas
   // Evidence that shows a gap: the row becomes Gap, a new Gap finding opens, and control strength drops to Weak.
   s = closeNeedsEvidence(s, finding(s, "F-DDQ-18-NE"), "Gap", "SOC 2 summary shows a qualified opinion", AT);
   o = computeOutcome(s);
-  assert.deepEqual([o.strength.gaps, o.strength.needsEvidence, o.strength.strength], [2, 1, "Weak"]);
+  assert.deepEqual([o.strength.gaps, o.strength.needsEvidence, o.strength.strength], [2, 6, "Weak"]);
   assert.equal(finding(s, "F-DDQ-18-GAP").status, "Open");
   assert.equal(finding(s, "F-DDQ-18-NE").status, "Closed");
   assert.equal(o.recommendation!.decision, "Escalate - do not approve yet");

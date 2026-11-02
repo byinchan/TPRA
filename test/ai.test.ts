@@ -45,13 +45,13 @@ function deps(over: Partial<ReviewDeps> = {}, call?: () => Promise<ModelCallResu
 
 // ---------- validator: the model is untrusted ----------
 
-test("saved demo output passes the same validation as live output: 26 rows, 1 Gap, 3 Needs evidence", () => {
+test("saved demo output passes the same validation as live output: 26 rows, 1 Gap, 8 Needs evidence", () => {
   const r = validateReview(DEMO_REVIEWS["v1-halden"]!.output, known)!;
   assert.equal(r.review.rows.length, 26);
   assert.deepEqual(r.guardrails, { droppedIds: 0, droppedRows: 0, missingRows: [], truncatedFields: 0 });
   const count = (k: string) => r.review.rows.filter((x) => x.rating === k).length;
-  assert.deepEqual([count("Gap"), count("Needs evidence")], [1, 3]);
-  assert.equal(DEMO_REVIEWS["v1-halden"]!.source.kind, "mock");
+  assert.deepEqual([count("Gap"), count("Needs evidence")], [1, 8]);
+  assert.equal(DEMO_REVIEWS["v1-halden"]!.source.kind, "model");
 });
 
 test("unknown IDs are dropped and counted; unknown IRA references are stripped", () => {
