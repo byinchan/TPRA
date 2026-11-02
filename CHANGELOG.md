@@ -105,7 +105,6 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
   - The finding comes from `lib/findings.ts` (`collectFindings`).
   - The recommendation cannot be "Approve" while it is open.
   - Tested: FIPPA triggered, all 26 rows Satisfactory, Strong controls, Low residual → "Approve with conditions".
-- **Backlog (CLAUDE.md):** after TPRA v1 ships, run `npm audit` on the Control-Mapping repo and move it off Next 16.3.6. This is recorded as a maintenance note only; no code or link connects the two projects.
 
 ## PR 3: screen 1, intake and inherent risk (2026-11-02)
 
@@ -142,4 +141,4 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **The assessment date** is the analyst's local date when the sample is loaded.
 - **"Start over"** asks for confirmation, then clears the tab's state.
 - **Screens 2 and 3** show as greyed-out steps until their PRs land.
-- **On narrow screens** the Calculated panel sits below the questions; on wide screens it stays in view beside them.
+- **On narrow screens** a compact sticky summary (inherent risk · tier · follow-ups) stays at the top and links to the full Calculated panel below the questions. On wide screens the panel stays in view beside them.
