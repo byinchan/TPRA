@@ -351,3 +351,15 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - **The draft-tracking key leaves out owners and due dates**, which the narrative never states. Setting the required due dates therefore doesn't mark the demo draft as stale. Approval uses the full facts.
 - **The number check is deliberately strict** and accepts only figures from the facts plus the rule thresholds. It can't catch an outdated statement with no number in it, which is why the stale-draft warning exists.
 - **Narrative regeneration is whole-draft** ("Discard draft", then draft again), not per section. This keeps one AI run per draft, matching the one-review-per-assessment rule on screen 2.
+
+## PR 8: Excel export (2026-11-02)
+
+### Added
+- **Download Excel** next to Download PDF, enabled only while the report is approved (an edit that voids the approval disables it). The gate is also enforced in code: `buildWorkbookTables` returns nothing unless the approval stands.
+- `lib/export/workbook.ts` (pure): three sheets, Inherent Risk (summary block, then the 16 IRA rows), Due Diligence (26 rows with vendor response, AI suggestion, final rating, note, status) and Findings. Every figure is read from `computeOutcome`, the same function screen 3 and the PDF use; nothing is recalculated.
+- `lib/export/download.ts`: generates the .xlsx in the browser (loaded on demand). Nothing is sent to a server.
+- `write-excel-file@4.1.1` (MIT; one dependency, fflate). Chosen in CLAUDE.md. Why: it writes real .xlsx files client-side with no server, supports wrapped text, widths and bold headers, and is small. Cells are written as text, so vendor or analyst text beginning with `=` is never a formula.
+- `test/workbook.test.ts`: approval gate, three sheets, figures equal to the computed outcome.
+
+### Notes
+- The summary block in the Inherent Risk sheet carries the recommendation, tier, FIPPA flag, control strength, residual risk, next review date and the vendor disclaimer.
