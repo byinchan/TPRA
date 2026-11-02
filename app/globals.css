@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+/* Print: Letter, 0.6in margins (matches lib/report/pages.ts). Only the report is printed. */
+@page {
+  size: letter;
+  margin: 0.6in;
+}

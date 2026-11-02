@@ -2,7 +2,6 @@
 // Maps SDK errors to UpstreamError kinds; returns parsed JSON and the request id, never logs content.
 import Anthropic from "@anthropic-ai/sdk";
 import { AI_CONFIG } from "../../config/ai.ts";
-import { REVIEW_SCHEMA } from "./schema.ts";
 import { UpstreamError, type ModelCallResult } from "./review.ts";
 
 let client: Anthropic | null = null;
@@ -21,7 +20,7 @@ function getClient(): Anthropic {
   return client;
 }
 
-export async function callClaude(system: string, user: string): Promise<ModelCallResult> {
+export async function callClaude(system: string, user: string, schema: Record<string, unknown>): Promise<ModelCallResult> {
   try {
     const { data, request_id } = await getClient()
       .messages.create({
@@ -29,7 +28,7 @@ export async function callClaude(system: string, user: string): Promise<ModelCal
         max_tokens: AI_CONFIG.maxTokens,
         system,
         messages: [{ role: "user", content: user }],
-        output_config: { effort: AI_CONFIG.effort, format: { type: "json_schema", schema: REVIEW_SCHEMA } },
+        output_config: { effort: AI_CONFIG.effort, format: { type: "json_schema", schema } },
       })
       .withResponse();
     const text = data.content.find((b) => b.type === "text");

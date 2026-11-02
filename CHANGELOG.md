@@ -299,3 +299,55 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
   - A Needs evidence finding reopens automatically if its row is re-rated Needs evidence on screen 2.
 - **`confirmRow` records a reason whenever one is given**, not only when the rating differs from the AI's.
 - **Tests:** 65 passing.
+
+## PR 7: executive report, number check, approval, print-to-PDF (2026-11-02)
+
+### Added
+- **`POST /api/narrative`:** the AI drafts the narrative only (7 short sections).
+  - The browser sends its tab state. The server re-validates it with the same strict `parseState` used on load, recomputes every figure with `computeOutcome`, and builds a **facts pack** (`lib/report/facts.ts`). The model sees only these code-computed facts.
+  - The request is refused unless all 26 rows are confirmed.
+  - The shared limiter (`lib/ai/sharedLimiter.ts`) means both AI routes count towards one per-IP limit and one daily cap.
+- **Code writes the fixed parts of the report:**
+  - the recommendation line, and the Escalate meaning when it applies;
+  - the inherent risk/tier/rule line and the FIPPA line;
+  - the due diligence counts line;
+  - the **findings table** (owner shown as **Unassigned** when it is still "Vendor owner (to assign)", due date, status);
+  - the residual risk and next review line;
+  - the "What this report does not show" line;
+  - the footer: "Fictional organization. AI-assisted, human-reviewed.", the boundary between figures and narrative, the vendor disclaimer and the prototype disclaimer.
+- **Number check (`lib/report/numberCheck.ts`):** every figure and rating in the narrative is compared with the facts.
+  - Numbers and number words, dates, percentages.
+  - Exact counts next to Gap / Needs evidence / open findings / follow-ups / unanswered questions / outstanding documents.
+  - Inherent / residual / control strength rating words, the tier, and the decision labels.
+  - It ignores IDs and standard names (ISO/IEC 27001, SOC 2, NIST SP 800-161 Rev. 1).
+  - Results show inline under each section.
+- **Approval** requires all of:
+  - every row confirmed;
+  - a clean number check;
+  - **a due date on every open finding**;
+  - a named preparer.
+
+  Editing a section withdraws an approval. Any later change to the facts (including an owner or due date) **voids** it, and the screen says so.
+- **Draft tracking:** each draft records the figures it was written from. If they change afterwards, the screen warns that the draft may be stale. The saved demo draft says whether it fits the analyst's figures.
+- **Print layout:** "Download PDF" opens the browser's Save as PDF and is only enabled once the report is approved.
+  - Letter size, 0.6in margins; only the report prints.
+  - A page estimate measures an off-screen copy at the printed width and warns if the report runs over 2 pages.
+  - The standard demo report is about 2 pages.
+- **Session state version 4** stores the report: AI draft and edited text per section, preparer, approval tied to the facts, and history.
+- **Tests:** 77 passing (12 new).
+  - The saved draft passes the number check on the standard path.
+  - The check catches wrong counts, ratings, tier, dates, decisions, invented figures and percentages, and ignores IDs and standard names.
+  - The approval gate, and approval voided or withdrawn by later changes.
+  - Stale-draft detection.
+  - Request validation, demo fit, live validation, refusals.
+  - Analyst text can't close the data tag.
+  - Page estimate.
+
+### Fixed
+- **Owner field:** the default "Vendor owner (to assign)" is now a placeholder, not pre-filled text. Typing an owner used to append to the default (found in browser testing).
+
+### Decisions (defaults, open to change)
+- **Placeholder demo draft:** it is written by the developer (`source.kind: "mock"`) and labelled until a recorded model run replaces it. Its stored figures key is computed by `scripts/demo-facts-key.ts`, not typed by hand.
+- **The draft-tracking key leaves out owners and due dates**, which the narrative never states. Setting the required due dates therefore doesn't mark the demo draft as stale. Approval uses the full facts.
+- **The number check is deliberately strict** and accepts only figures from the facts plus the rule thresholds. It can't catch an outdated statement with no number in it, which is why the stale-draft warning exists.
+- **Narrative regeneration is whole-draft** ("Discard draft", then draft again), not per section. This keeps one AI run per draft, matching the one-review-per-assessment rule on screen 2.

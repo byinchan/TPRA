@@ -6,7 +6,7 @@ import { AI_CONFIG } from "../config/ai.ts";
 import { ANSWER_RATINGS } from "../config/rules.ts";
 import { apiKeyPresent, callClaude } from "../lib/ai/anthropic.ts";
 import { REVIEW_SYSTEM_PROMPT, buildReviewUserMessage } from "../lib/ai/prompt.ts";
-import { validateReview } from "../lib/ai/schema.ts";
+import { REVIEW_SCHEMA, validateReview } from "../lib/ai/schema.ts";
 import { IRA_QUESTIONS, SAMPLES } from "../lib/sample.ts";
 
 const sampleId = process.argv[2] ?? "v1-deloitte";
@@ -15,7 +15,7 @@ if (!sample) throw new Error(`Unknown sample ${sampleId}`);
 if (!apiKeyPresent()) throw new Error("ANTHROPIC_API_KEY is not set (use --env-file=.env.local).");
 
 const answers = sample.iraAnswers.map(({ id, answer }) => ({ id, answer }));
-const res = await callClaude(REVIEW_SYSTEM_PROMPT, buildReviewUserMessage(sample, IRA_QUESTIONS, answers));
+const res = await callClaude(REVIEW_SYSTEM_PROMPT, buildReviewUserMessage(sample, IRA_QUESTIONS, answers), REVIEW_SCHEMA);
 const checked =
   res.stopReason === "end_turn"
     ? validateReview(res.json, { iraIds: Object.keys(ANSWER_RATINGS), ddqIds: sample.ddq.map((r) => r.id) })

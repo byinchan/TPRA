@@ -8,6 +8,7 @@ import { SAMPLES } from "@/lib/sample.ts";
 import { DEFAULT_OWNER, OWNER_MAX, REASON_MAX, type AssessmentState } from "@/lib/session.ts";
 import { FIPPA, RECOMMENDATION_MEANING } from "@/config/rules.ts";
 import { Badge, LevelPill } from "./Badge.tsx";
+import { ReportPanel } from "./ReportPanel.tsx";
 import { Steps } from "./Steps.tsx";
 import { useAssessment } from "./useAssessment.ts";
 
@@ -54,8 +55,10 @@ export function FindingsScreen() {
 
   return (
     <div className="space-y-6">
-      <Steps current={3} loaded />
-      <header className="space-y-1">
+      <div className="print:hidden">
+        <Steps current={3} loaded />
+      </div>
+      <header className="space-y-1 print:hidden">
         <h1 className="text-2xl font-semibold">Findings & report</h1>
         <p className="text-stone-700">
           <span className="font-medium">{sample.vendor}</span> · {sample.service} · assessed {s.assessedOn}
@@ -64,12 +67,12 @@ export function FindingsScreen() {
       </header>
 
       {actionError && (
-        <p role="alert" className="rounded border border-red-300 bg-red-50 p-3 text-sm">
+        <p role="alert" className="rounded border border-red-300 bg-red-50 p-3 text-sm print:hidden">
           {actionError}
         </p>
       )}
 
-      <section aria-label="Calculated outcome" className="space-y-4 rounded border border-sky-200 bg-sky-50 p-5">
+      <section aria-label="Calculated outcome" className="space-y-4 rounded border border-sky-200 bg-sky-50 p-5 print:hidden">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-600">Calculated outcome</h2>
           <Badge kind="Code" />
@@ -147,7 +150,7 @@ export function FindingsScreen() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-3 print:hidden">
         <div className="flex flex-wrap items-baseline gap-2">
           <h2 className="text-lg font-semibold">Findings ({o.findings.length})</h2>
           <span className="text-sm text-stone-600">{o.openFindings} open</span>
@@ -171,11 +174,9 @@ export function FindingsScreen() {
         )}
       </section>
 
-      <p className="rounded border border-dashed border-stone-300 p-4 text-sm text-stone-600">
-        The executive summary (AI-drafted narrative, analyst-edited and approved) and the PDF and Excel downloads arrive
-        in the next pull requests.
-      </p>
-      <p className="text-xs text-stone-500">
+      <ReportPanel state={s} apply={apply} />
+
+      <p className="text-xs text-stone-500 print:hidden">
         Saved only in this browser tab. Closing the tab erases the assessment; nothing is stored on a server.
       </p>
     </div>
@@ -184,11 +185,13 @@ export function FindingsScreen() {
 
 function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: AssessmentState) => AssessmentState) => void }) {
   const uid = useId();
-  const [owner, setOwnerText] = useState(f.owner);
+  // The default owner shows as a placeholder, so typing replaces it instead of appending to it.
+  const shownOwner = f.owner === DEFAULT_OWNER ? "" : f.owner;
+  const [owner, setOwnerText] = useState(shownOwner);
   const [closing, setClosing] = useState(false);
   const [note, setNote] = useState("");
   const [rerate, setRerate] = useState<"Satisfactory" | "Gap">("Satisfactory");
-  useEffect(() => setOwnerText(f.owner), [f.owner]);
+  useEffect(() => setOwnerText(shownOwner), [shownOwner]);
   const sourceHref = f.source === "Due diligence" ? `/review#${f.sourceRow}` : f.source === "IRA follow-up" ? "/review" : "/";
 
   return (
@@ -233,7 +236,7 @@ function FindingCard({ finding: f, apply }: { finding: Finding; apply: (fn: (s: 
             maxLength={OWNER_MAX}
             placeholder={DEFAULT_OWNER}
             onChange={(e) => setOwnerText(e.target.value)}
-            onBlur={() => owner.trim() !== f.owner && apply((s) => setOwner(s, f.id, owner, now()))}
+            onBlur={() => owner.trim() !== shownOwner && apply((s) => setOwner(s, f.id, owner, now()))}
             className="w-full rounded border border-stone-300 px-2 py-1 text-sm"
           />
         </div>
