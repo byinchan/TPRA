@@ -8,8 +8,8 @@ import { isIsoDate } from "./dates.ts";
 import { DDQ_IDS, SAMPLES, type SampleVendor } from "./sample.ts";
 import { ANSWERS, DDQ_RATINGS, type Answer, type DdqRating } from "./types.ts";
 
-export const STORAGE_KEY = "tpra.assessment.v2";
-export const STATE_VERSION = 2;
+export const STORAGE_KEY = "tpra.assessment.v3";
+export const STATE_VERSION = 3;
 export const REASON_MAX = 300;
 export const NOTE_MAX = LIMITS.maxRationaleChars;
 export const EVIDENCE_MAX = LIMITS.maxEvidenceChars;
@@ -71,6 +71,36 @@ export interface ReviewMeta {
   receivedAt: string;
 }
 
+export const FINDING_STATUSES = ["Open", "Closed"] as const;
+export const DEFAULT_OWNER = "Vendor owner (to assign)";
+export const OWNER_MAX = 80;
+/** F-IRA-12 (follow-up), F-DDQ-03-NE / F-DDQ-11-GAP (questionnaire row + kind), F-FIPPA. */
+export const FINDING_ID = /^F-(IRA-\d{2}|DDQ-\d{2}-(NE|GAP)|FIPPA)$/;
+export const FINDING_KINDS = ["Follow-up", "Gap", "Needs evidence", "FIPPA"] as const;
+export const FINDING_SOURCES = ["IRA follow-up", "Due diligence", "FIPPA"] as const;
+
+/** What a finding was when it was closed, so it stays visible after its source changes. */
+export interface FindingSnapshot {
+  kind: (typeof FINDING_KINDS)[number];
+  source: (typeof FINDING_SOURCES)[number];
+  sourceRow: string;
+  title: string;
+}
+
+/** Analyst-entered details for a finding. Findings themselves are derived by code (lib/findings.ts). */
+export interface FindingMeta {
+  id: string;
+  owner: string;
+  /** YYYY-MM-DD or null (not set yet). */
+  dueDate: string | null;
+  status: (typeof FINDING_STATUSES)[number];
+  /** Required to close. */
+  closeNote: string | null;
+  /** Set when the finding is closed. */
+  snapshot: FindingSnapshot | null;
+  history: { at: string; detail: string }[];
+}
+
 export interface AssessmentState {
   version: typeof STATE_VERSION;
   sampleId: string;
@@ -79,6 +109,8 @@ export interface AssessmentState {
   ira: IraState[];
   review: ReviewMeta | null;
   ddq: DdqState[];
+  /** Only findings the analyst has touched; the rest use defaults. */
+  findings: FindingMeta[];
 }
 
 const IRA_IDS = Object.keys(ANSWER_RATINGS);
@@ -99,6 +131,7 @@ export function createFromSample(sample: SampleVendor, assessedOn: string): Asse
       confirmed: false,
       history: [],
     })),
+    findings: [],
   };
 }
 
@@ -184,6 +217,29 @@ function isDdqRow(v: unknown, expectedId: string | undefined): v is DdqState {
   );
 }
 
+function isFindingMeta(v: unknown): v is FindingMeta {
+  return (
+    isObject(v) &&
+    typeof v.id === "string" &&
+    FINDING_ID.test(v.id) &&
+    isShortString(v.owner, OWNER_MAX) &&
+    (v.owner as string).trim() !== "" &&
+    (v.dueDate === null || (typeof v.dueDate === "string" && isIsoDate(v.dueDate))) &&
+    FINDING_STATUSES.some((st) => st === v.status) &&
+    (v.closeNote === null || (isShortString(v.closeNote, REASON_MAX) && (v.closeNote as string).trim() !== "")) &&
+    (v.status === "Open" || v.closeNote !== null) &&
+    (v.snapshot === null ||
+      (isObject(v.snapshot) &&
+        FINDING_KINDS.some((k) => k === (v.snapshot as Record<string, unknown>).kind) &&
+        FINDING_SOURCES.some((k) => k === (v.snapshot as Record<string, unknown>).source) &&
+        isShortString((v.snapshot as Record<string, unknown>).sourceRow, 10) &&
+        isShortString((v.snapshot as Record<string, unknown>).title, 400))) &&
+    Array.isArray(v.history) &&
+    v.history.length <= HISTORY_MAX &&
+    v.history.every((h) => isObject(h) && isTimestamp(h.at) && isShortString(h.detail, DETAIL_MAX))
+  );
+}
+
 function isReviewMeta(v: unknown): v is ReviewMeta {
   if (!isObject(v)) return false;
   const s = v.source;
@@ -226,6 +282,8 @@ export function parseState(raw: string | null): AssessmentState | null {
   if (!(v.review === null || isReviewMeta(v.review))) return null;
   if (!Array.isArray(v.ddq) || v.ddq.length !== DDQ_IDS.length) return null;
   if (!v.ddq.every((row, i) => isDdqRow(row, DDQ_IDS[i]))) return null;
+  if (!Array.isArray(v.findings) || v.findings.length > 60 || !v.findings.every(isFindingMeta)) return null;
+  if (new Set(v.findings.map((f) => (f as FindingMeta).id)).size !== v.findings.length) return null;
   // Rebuild so unknown extra fields are dropped.
   const review = v.review as ReviewMeta | null;
   return {
@@ -271,6 +329,15 @@ export function parseState(raw: string | null): AssessmentState | null {
       overrideReason,
       confirmed,
       history: history.map(({ at, action, detail }) => ({ at, action, detail })),
+    })),
+    findings: (v.findings as FindingMeta[]).map(({ id, owner, dueDate, status, closeNote, snapshot, history }) => ({
+      id,
+      owner,
+      dueDate,
+      status,
+      closeNote,
+      snapshot: snapshot && { kind: snapshot.kind, source: snapshot.source, sourceRow: snapshot.sourceRow, title: snapshot.title },
+      history: history.map(({ at, detail }) => ({ at, detail })),
     })),
   };
 }

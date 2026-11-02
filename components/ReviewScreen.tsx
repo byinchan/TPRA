@@ -272,9 +272,15 @@ export function ReviewScreen() {
               )}
             </div>
             <p className="border-t border-sky-200 pt-2 text-xs text-stone-600">
-              Residual risk, findings and the recommendation are calculated on screen 3 (next pull request).
+              Residual risk, findings and the recommendation are calculated on screen 3 once every row is confirmed.
             </p>
           </div>
+          <Link
+            href="/report"
+            className="block rounded bg-stone-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-stone-700"
+          >
+            Continue to findings & report →
+          </Link>
           <p className="text-xs text-stone-500">
             Saved only in this browser tab. Closing the tab erases the assessment; nothing is stored on a server.
           </p>

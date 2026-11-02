@@ -70,6 +70,12 @@ export const FIPPA = {
   findingTitle: "Confirm with Privacy Office whether a supplementary assessment is required",
 } as const;
 
+/** Plain-language meaning of a recommendation, shown on screen 3 and in the report. */
+export const RECOMMENDATION_MEANING: Record<string, string> = {
+  "Escalate - do not approve yet":
+    "Escalate means a designated risk owner must review the residual risk and decide whether to accept it before the engagement proceeds. It does not mean the vendor is rejected.",
+};
+
 export const RULES: { id: string; name: string; status: RuleStatus; text: string }[] = [
   {
     id: "answer-ratings",

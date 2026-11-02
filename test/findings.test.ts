@@ -20,7 +20,7 @@ test("a triggered FIPPA flag is an open finding, so the recommendation cannot be
   assert.equal(fippa.triggered, true);
   const findings = collectFindings({ followUps: [], confirmedDdq: allSatisfactory, fippa });
   assert.deepEqual(findings, [
-    { id: "F-FIPPA", source: "FIPPA", sourceRow: "IRA-13", title: FIPPA.findingTitle },
+    { id: "F-FIPPA", source: "FIPPA", sourceRow: "IRA-13", kind: "FIPPA", title: FIPPA.findingTitle },
   ]);
   assert.equal(FIPPA.findingTitle, "Confirm with Privacy Office whether a supplementary assessment is required");
 
@@ -50,8 +50,8 @@ test("follow-ups and non-satisfactory confirmed rows become findings with stable
     findings.map((f) => [f.id, f.source, f.title]),
     [
       ["F-IRA-12", "IRA follow-up", "Resolve unknown answer: Will subcontractors be involved?"],
-      ["F-DDQ-03", "Due diligence", "Needs evidence: Q3"],
-      ["F-DDQ-11", "Due diligence", "Gap: Q11"],
+      ["F-DDQ-03-NE", "Due diligence", "Needs evidence: Q3"],
+      ["F-DDQ-11-GAP", "Due diligence", "Gap: Q11"],
     ],
   );
 });

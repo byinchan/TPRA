@@ -127,6 +127,15 @@ re-run the v1 back-test after any change.
   Weak -> one level above (max High). Marked "Provisional" while any Needs evidence row is open.
 - Recommendation: Approve (no open findings) / Approve with conditions (open findings, residual
   not High) / Escalate - do not approve yet (residual High or control strength Weak).
+  Residual risk and the recommendation appear only once ALL questionnaire rows are confirmed.
+  When it is Escalate, screen 3 and the report say in one line that a risk owner must decide
+  whether to accept the residual risk; it does not mean the vendor is rejected.
+- Findings: every open follow-up, confirmed Gap / Needs evidence row and triggered FIPPA flag.
+  IDs: F-IRA-xx, F-DDQ-xx-NE / F-DDQ-xx-GAP, F-FIPPA. Closing needs a note. IRA follow-ups close
+  only by resolving the answer (screen 2). A Needs evidence finding closes only by re-rating its
+  source row (Satisfactory or Gap) with the evidence note as the reason; the row is re-confirmed
+  and control strength recalculates (a Gap re-rating opens a new Gap finding). Closed findings
+  stay listed for traceability.
 - BC privacy flag: if data may leave Canada (IRA-13 = Yes/Unknown) AND personal information is
   involved (IRA-02 or IRA-16 = Yes/Unknown) -> "FIPPA: storage outside Canada - check whether a
   supplementary assessment is required (confirm with Privacy Office)". If not triggered, show it
@@ -154,6 +163,8 @@ re-run the v1 back-test after any change.
 - Sections, in order: Recommendation (code-written line first); Engagement & scope; Inherent risk
   & tier; Due diligence results; Findings & conditions (owner, due date); Residual risk & next
   review date; Method & limitations. 1-2 pages; warn if over.
+- Approval also requires a due date on every open finding. Owners may stay "Vendor owner (to
+  assign)", but the report lists those findings as unassigned.
 - Footer: "Fictional organization. AI-assisted, human-reviewed." + the vendor disclaimer.
 
 ## Six governance principles (design requirements, visible in the product, same names as Crosswalk)
