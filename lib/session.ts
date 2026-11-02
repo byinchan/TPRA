@@ -5,11 +5,12 @@ import { ANSWER_RATINGS } from "../config/rules.ts";
 import { isStoredAiRow, isStoredInconsistency, type AiInconsistency, type AiRowSuggestion, type Guardrails } from "./ai/schema.ts";
 import { DEMO_REASONS, type DemoReason, type ReviewSource } from "./ai/types.ts";
 import { isIsoDate } from "./dates.ts";
+import { SECTION_KEYS, SECTION_MAX, type SectionKey } from "./report/schema.ts";
 import { DDQ_IDS, SAMPLES, type SampleVendor } from "./sample.ts";
 import { ANSWERS, DDQ_RATINGS, type Answer, type DdqRating } from "./types.ts";
 
-export const STORAGE_KEY = "tpra.assessment.v3";
-export const STATE_VERSION = 3;
+export const STORAGE_KEY = "tpra.assessment.v4";
+export const STATE_VERSION = 4;
 export const REASON_MAX = 300;
 export const NOTE_MAX = LIMITS.maxRationaleChars;
 export const EVIDENCE_MAX = LIMITS.maxEvidenceChars;
@@ -101,6 +102,31 @@ export interface FindingMeta {
   history: { at: string; detail: string }[];
 }
 
+export const PREPARER_MAX = 80;
+
+export interface ReportSection {
+  /** The AI draft, kept unchanged for traceability. */
+  aiText: string;
+  /** What the report shows (the analyst's edits, or the draft). */
+  text: string;
+}
+
+export interface ReportState {
+  mode: "live" | "demo";
+  demoReason: DemoReason | null;
+  source: ReviewSource;
+  /** Demo only: false when the saved narrative was written for different figures. */
+  demoMatchesFacts: boolean | null;
+  draftedAt: string;
+  /** factsFingerprint when drafted: if the figures change later, the screen warns that the draft may be stale. */
+  factsKey: string;
+  sections: Record<SectionKey, ReportSection>;
+  preparer: string;
+  /** Valid only while `key` still equals the current facts (any later change voids it). */
+  approved: { at: string; by: string; key: string } | null;
+  history: { at: string; detail: string }[];
+}
+
 export interface AssessmentState {
   version: typeof STATE_VERSION;
   sampleId: string;
@@ -111,6 +137,7 @@ export interface AssessmentState {
   ddq: DdqState[];
   /** Only findings the analyst has touched; the rest use defaults. */
   findings: FindingMeta[];
+  report: ReportState | null;
 }
 
 const IRA_IDS = Object.keys(ANSWER_RATINGS);
@@ -132,6 +159,7 @@ export function createFromSample(sample: SampleVendor, assessedOn: string): Asse
       history: [],
     })),
     findings: [],
+    report: null,
   };
 }
 
@@ -240,6 +268,40 @@ function isFindingMeta(v: unknown): v is FindingMeta {
   );
 }
 
+function isSource(s: unknown): s is ReviewSource {
+  return (
+    isObject(s) &&
+    (s.kind === "model" || s.kind === "mock") &&
+    (s.model === null || isShortString(s.model, 100)) &&
+    isTimestamp(s.generatedAt) &&
+    isShortString(s.note, 500)
+  );
+}
+
+function isReport(v: unknown): v is ReportState {
+  if (!isObject(v) || !isObject(v.sections)) return false;
+  const sections = v.sections;
+  const a = v.approved;
+  return (
+    (v.mode === "live" || v.mode === "demo") &&
+    (v.demoReason === null || DEMO_REASONS.some((r) => r === v.demoReason)) &&
+    (v.demoMatchesFacts === null || typeof v.demoMatchesFacts === "boolean") &&
+    isSource(v.source) &&
+    isTimestamp(v.draftedAt) &&
+    isShortString(v.factsKey, 20_000) &&
+    Object.keys(sections).length === SECTION_KEYS.length &&
+    SECTION_KEYS.every((k) => {
+      const sec = sections[k];
+      return isObject(sec) && isShortString(sec.aiText, SECTION_MAX) && isShortString(sec.text, SECTION_MAX * 2);
+    }) &&
+    isShortString(v.preparer, PREPARER_MAX) &&
+    (a === null || (isObject(a) && isTimestamp(a.at) && isShortString(a.by, PREPARER_MAX) && isShortString(a.key, 50_000))) &&
+    Array.isArray(v.history) &&
+    v.history.length <= HISTORY_MAX &&
+    v.history.every((h) => isObject(h) && isTimestamp(h.at) && isShortString(h.detail, DETAIL_MAX))
+  );
+}
+
 function isReviewMeta(v: unknown): v is ReviewMeta {
   if (!isObject(v)) return false;
   const s = v.source;
@@ -248,11 +310,7 @@ function isReviewMeta(v: unknown): v is ReviewMeta {
     (v.mode === "live" || v.mode === "demo") &&
     (v.demoReason === null || DEMO_REASONS.some((r) => r === v.demoReason)) &&
     (v.demoMatchesAnswers === null || typeof v.demoMatchesAnswers === "boolean") &&
-    isObject(s) &&
-    (s.kind === "model" || s.kind === "mock") &&
-    (s.model === null || isShortString(s.model, 100)) &&
-    isTimestamp(s.generatedAt) &&
-    isShortString(s.note, 500) &&
+    isSource(s) &&
     isObject(g) &&
     [g.droppedIds, g.droppedRows, g.truncatedFields].every((n) => Number.isInteger(n) && (n as number) >= 0) &&
     Array.isArray(g.missingRows) &&
@@ -284,6 +342,8 @@ export function parseState(raw: string | null): AssessmentState | null {
   if (!v.ddq.every((row, i) => isDdqRow(row, DDQ_IDS[i]))) return null;
   if (!Array.isArray(v.findings) || v.findings.length > 60 || !v.findings.every(isFindingMeta)) return null;
   if (new Set(v.findings.map((f) => (f as FindingMeta).id)).size !== v.findings.length) return null;
+  if (!(v.report === null || isReport(v.report))) return null;
+  const report = v.report as ReportState | null;
   // Rebuild so unknown extra fields are dropped.
   const review = v.review as ReviewMeta | null;
   return {
@@ -339,5 +399,19 @@ export function parseState(raw: string | null): AssessmentState | null {
       snapshot: snapshot && { kind: snapshot.kind, source: snapshot.source, sourceRow: snapshot.sourceRow, title: snapshot.title },
       history: history.map(({ at, detail }) => ({ at, detail })),
     })),
+    report: report && {
+      mode: report.mode,
+      demoReason: report.demoReason,
+      source: { kind: report.source.kind, model: report.source.model, generatedAt: report.source.generatedAt, note: report.source.note },
+      demoMatchesFacts: report.demoMatchesFacts,
+      draftedAt: report.draftedAt,
+      factsKey: report.factsKey,
+      sections: Object.fromEntries(
+        SECTION_KEYS.map((k) => [k, { aiText: report.sections[k].aiText, text: report.sections[k].text }]),
+      ) as Record<SectionKey, ReportSection>,
+      preparer: report.preparer,
+      approved: report.approved && { at: report.approved.at, by: report.approved.by, key: report.approved.key },
+      history: report.history.map(({ at, detail }) => ({ at, detail })),
+    },
   };
 }

@@ -2,11 +2,8 @@
 // Logs only an outcome and the Anthropic request id. Never logs or stores request or response text.
 import { LIMITS } from "@/config/ai.ts";
 import { apiKeyPresent, callClaude } from "@/lib/ai/anthropic.ts";
-import { createLimiter } from "@/lib/ai/limits.ts";
 import { parseReviewRequest, runReview } from "@/lib/ai/review.ts";
-
-// Module scope: shared by requests that reach the same server instance.
-const limiter = createLimiter(LIMITS);
+import { sharedLimiter } from "@/lib/ai/sharedLimiter.ts";
 
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -37,7 +34,7 @@ export async function POST(req: Request) {
 
   const result = await runReview(parsed, {
     apiKeyPresent: apiKeyPresent(),
-    limiter,
+    limiter: sharedLimiter,
     ip: clientIp(req),
     now: () => new Date(),
     callModel: callClaude,

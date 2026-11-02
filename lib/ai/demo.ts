@@ -1,5 +1,6 @@
-// Saved review outputs for demo mode, one per sample. Each is validated like a live response before use.
+// Saved outputs for demo mode (review and report narrative), one per sample. Each is validated like a live response before use.
 import v1Demo from "../../data/demo/v1-deloitte-review.json" with { type: "json" };
+import v1Narrative from "../../data/demo/v1-deloitte-narrative.json" with { type: "json" };
 import type { Answer } from "../types.ts";
 import type { ReviewSource } from "./types.ts";
 
@@ -14,4 +15,16 @@ export interface DemoFile {
 
 export const DEMO_REVIEWS: Record<string, DemoFile> = {
   "v1-deloitte": v1Demo as DemoFile,
+};
+
+export interface DemoNarrativeFile {
+  sampleId: string;
+  source: ReviewSource;
+  /** factsFingerprint of the state the saved narrative was written for. */
+  factsKey: string;
+  output: unknown;
+}
+
+export const DEMO_NARRATIVES: Record<string, DemoNarrativeFile> = {
+  "v1-deloitte": v1Narrative as DemoNarrativeFile,
 };

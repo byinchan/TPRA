@@ -6,7 +6,7 @@ import { ANSWERS, type IraAnswer } from "../types.ts";
 import { DEMO_REVIEWS } from "./demo.ts";
 import type { Limiter } from "./limits.ts";
 import { REVIEW_SYSTEM_PROMPT, buildReviewUserMessage } from "./prompt.ts";
-import { validateReview } from "./schema.ts";
+import { REVIEW_SCHEMA, validateReview } from "./schema.ts";
 import type { DemoReason, ModelCallResult, ReviewResult } from "./types.ts";
 
 export type { DemoReason, ReviewResult, ReviewSource, ReviewSuccess, ReviewFailure, ModelCallResult } from "./types.ts";
@@ -34,7 +34,7 @@ export interface ReviewDeps {
   limiter: Limiter;
   ip: string;
   now: () => Date;
-  callModel: (system: string, user: string) => Promise<ModelCallResult>;
+  callModel: (system: string, user: string, schema: Record<string, unknown>) => Promise<ModelCallResult>;
   /** Status-and-request-id logging only. */
   log: (event: { outcome: string; requestId?: string | null }) => void;
 }
@@ -92,7 +92,7 @@ export async function runReview(req: ReviewRequest, deps: ReviewDeps): Promise<R
 
   const sample = SAMPLES[req.sampleId]!;
   try {
-    const res = await deps.callModel(REVIEW_SYSTEM_PROMPT, buildReviewUserMessage(sample, IRA_QUESTIONS, req.ira));
+    const res = await deps.callModel(REVIEW_SYSTEM_PROMPT, buildReviewUserMessage(sample, IRA_QUESTIONS, req.ira), REVIEW_SCHEMA);
     const checked = res.stopReason === "end_turn" ? validateReview(res.json, known()) : null;
     if (!checked) {
       deps.log({ outcome: `invalid-output:${res.stopReason ?? "none"}`, requestId: res.requestId });
