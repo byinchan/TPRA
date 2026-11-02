@@ -376,3 +376,7 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 ### Open
 - README says screenshots will be added in `docs/screenshots`; none are taken yet.
 - The saved demo review and narrative are still developer-written placeholders (unchanged).
+
+### Changed after review (PR 9 branch)
+- **Excel restructured into 5 tabs:** Summary (title and label/value rows, no tables), Inherent Risk (4 columns), Due Diligence (6 columns), Findings (6 columns), Audit trail (AI suggestions, override reasons, confirmation status, rules applied, IRA answer changes, closing notes). Bold header with light fill, wrapped top-aligned text, frozen header row, widths capped at 45. Figures still come from `computeOutcome`. Checked by writing the file and reading the XML back.
+- **About and Content notice pages removed.** Their content is in the README. The app footer is one line linking to the README on GitHub; CLAUDE.md no longer asks for in-app explanation pages.

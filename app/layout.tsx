@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 
+const README_URL = "https://github.com/byinchan/TPRA#readme";
+
 export const metadata: Metadata = {
   title: "TPRA: AI-Assisted Third-Party Risk Assessment",
   description:
@@ -23,20 +25,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/rules" className="text-stone-600 hover:text-stone-900">
               Rules
             </Link>
-            <Link href="/about" className="text-stone-600 hover:text-stone-900">
-              About
-            </Link>
-            <Link href="/content-notice" className="text-stone-600 hover:text-stone-900">
-              Content notice
-            </Link>
           </nav>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-8 print:max-w-none print:p-0">{children}</main>
-        <footer className="mx-auto max-w-6xl space-y-1 border-t border-stone-200 px-4 py-6 text-xs text-stone-500 print:hidden">
+        <footer className="mx-auto max-w-6xl border-t border-stone-200 px-4 py-6 text-xs text-stone-500 print:hidden">
           <p>
-            This is a workflow and governance prototype, not a commercial TPRM platform or an enterprise-ready product.
+            Fictional organization and vendor · Prototype, not a commercial TPRM platform · AI-assisted, human-reviewed ·{" "}
+            <a href={README_URL} target="_blank" rel="noreferrer" className="underline">
+              How it works →
+            </a>
           </p>
-          <p>Fictional organization. AI-assisted, human-reviewed.</p>
         </footer>
       </body>
     </html>

@@ -27,10 +27,15 @@ The rules are fixed and shown on the Rules page. Screenshots will be added to `d
 Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4. Deterministic logic is pure, unit-tested functions in `lib/` and one rules file in `config/`; the UI never computes scores. Two server routes call the Anthropic Claude API with strict schemas, validate every response and accept only existing row IDs. A per-IP limit, a daily cap and a saved **demo mode** (used automatically when the key is missing, rate-limited or over budget) keep it cheap and safe. State is validated `sessionStorage`. Tests: `node --test`; CI runs them before deploy. The Excel file is generated in the browser with `write-excel-file`.
 
 ## Six governance principles
-Human-owned GRC logic · Human approval before authoritative records · Traceability and auditability · Transparency about uncertainty · Deterministic over generative where possible · Data minimization by design. Details are on the About page.
+1. **Human-Owned GRC Logic.** The AI proposes and the analyst decides. The scoring rules (inherent risk, tier, control strength, residual risk, recommendation, FIPPA flag) are fixed and visible on the Rules page.
+2. **Human Approval Before Authoritative Records.** Questionnaire rows and findings count only once confirmed; unconfirmed rows show "Awaiting review". A report can be approved only after a clean number check and with a named preparer.
+3. **Traceability and Auditability.** Each answer, row and finding keeps its change history and the AI's original suggestion. This is for the current tab only, not a durable audit trail.
+4. **Transparency About Uncertainty.** AI output and template text are labelled. "Unknown" answers, conflicts and missing evidence stay visible, and an override needs a reason. The report states what it does not show: no evidence files were reviewed and no on-site assessment was done.
+5. **Deterministic Over Generative Where Possible.** Scores, tier, residual risk, recommendation, findings, review dates, the Excel export and every number in the report come from code.
+6. **Data Minimization by Design.** No accounts, database or saved sessions. Nothing is stored on the server and user-entered text is never logged.
 
 ## Data handling
-No accounts, database or saved sessions: your work lives in the browser tab and is lost when it closes. For AI steps, the vendor responses and your entries are sent through this app's server to the Anthropic API. This app stores nothing and logs only status and request id. How Anthropic handles API data is set by its current terms and privacy policy; check them, and do not enter real or sensitive information.
+No accounts, database or saved sessions: your work lives in the browser tab and is lost when it closes. For AI steps, the vendor responses and your entries are sent through this app's server to the Anthropic API. This app stores nothing and logs only status and request id. How Anthropic handles API data is set by its current terms and privacy policy; check them, and do not enter real or sensitive information. Saved demo mode makes no AI call.
 
 ## Prototype boundaries
 No authentication, database, durable persistence, vendor portal, integrations, contract management or continuous monitoring. In practice this could run in a GRC platform such as ServiceNow VRM or OneTrust; neither is integrated.
@@ -41,7 +46,7 @@ Halden Advisory (fictional), AI governance consulting. The sample is based on my
 > Halden Advisory is a fictional vendor. Vendor responses are illustrative and were written for this portfolio. They make no statement about any real organization's security practices.
 
 ## Content notice
-The SIG is licensed material; the questions here are my own wording "based on SIG Lite" and do not reproduce SIG text. NIST SP 800-161 Rev. 1 is a U.S. government publication of NIST. The FIPPA flag is not legal advice. See the Content notice page in the app.
+The SIG is licensed material; the questions here are my own wording "based on SIG Lite" and do not reproduce SIG text. NIST SP 800-161 Rev. 1 is a U.S. government publication of NIST. The FIPPA flag is not legal advice.
 
 ## Not in v1 (backlog)
 A second, higher-risk sample vendor (Northbridge Billing Systems, fictional) to show a different tier and outcome; an OT/SCADA vendor with NERC CIP-013-aligned checks; blank new-vendor intake; full SIG; evidence file upload; contract clause review; monitoring and reassessment reminders; multi-vendor dashboard.

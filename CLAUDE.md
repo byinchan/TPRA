@@ -54,8 +54,8 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
 - Note in the app and README that Northbridge is fictional.
 
 - SIG content: Shared Assessments SIG is licensed material. Questions in this project are my own
-  wording "based on SIG Lite"; never reproduce SIG question text from memory. Say so on a
-  "Content notice" page. NIST SP 800-161 is a US government publication; attribute NIST.
+  wording "based on SIG Lite"; never reproduce SIG question text from memory. Say so in the README
+  "Content notice" section. NIST SP 800-161 is a US government publication; attribute NIST.
 
 ## Stack and conventions
 - Next.js 16 App Router, React 19, TypeScript 5.9, Tailwind CSS 4 (via @tailwindcss/postcss),
@@ -168,7 +168,7 @@ re-run the v1 back-test after any change.
   assign)", but the report lists those findings as unassigned.
 - Footer: "Fictional organization. AI-assisted, human-reviewed." + the vendor disclaimer.
 
-## Six governance principles (design requirements, visible in the product, same names as Crosswalk)
+## Six governance principles (design requirements, behaviour visible in the product, explained in the README, same names as Crosswalk)
 1. Human-Owned GRC Logic. The AI proposes and the analyst decides. The scoring rules (inherent
    risk, tier, control strength, residual risk, recommendation, FIPPA flag) are fixed and visible
    in the app.
@@ -190,7 +190,10 @@ re-run the v1 back-test after any change.
    (check current terms; do not overclaim).
 
 ## Prototype boundaries and disclaimer
-Verbatim at top of README and in the app footer/About page:
+Verbatim at top of README. The app has NO explanation pages (no About, no Content notice): its footer is one line,
+"Fictional organization and vendor · Prototype, not a commercial TPRM platform · AI-assisted, human-reviewed ·
+How it works →", linking to the README on GitHub. Governance principles, content notice, data handling and
+prototype boundaries live in the README only:
 "This is a workflow and governance prototype, not a commercial TPRM platform or an enterprise-ready product."
 No authentication, no database, no durable persistence, no vendor portal, no integrations, no
 contract management, no continuous monitoring. Enterprise note: in practice this could run in a

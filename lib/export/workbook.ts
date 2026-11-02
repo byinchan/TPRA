@@ -7,14 +7,15 @@ import { approvalStatus } from "../report/state.ts";
 import { IRA_QUESTIONS, SAMPLES } from "../sample.ts";
 import type { AssessmentState } from "../session.ts";
 
-export const SHEET_NAMES = ["Inherent Risk", "Due Diligence", "Findings"] as const;
+export const SHEET_NAMES = ["Summary", "Inherent Risk", "Due Diligence", "Findings", "Audit trail"] as const;
+export const MAX_COL_WIDTH = 45;
 
 export interface SheetTable {
   name: (typeof SHEET_NAMES)[number];
-  /** Row 1 of `rows` is a header (or a field/value pair list for summaries); every cell is text. */
+  /** Row 0 is the frozen header row (the title on Summary); every cell is text. */
   rows: string[][];
-  /** Index of the first row that is a column header, for bold styling. */
-  headerRows: number[];
+  /** Summary: rows after the title are label/value pairs and the first column is bold. */
+  labelColumn: boolean;
   widths: number[];
 }
 
@@ -27,67 +28,66 @@ export function buildWorkbookTables(state: AssessmentState): SheetTable[] | null
   const sample = SAMPLES[state.sampleId]!;
   const rated = rateIra(state.ira);
   const approved = state.report.approved!;
+  const open = o.findings.filter((f) => f.status === "Open").length;
 
   const summary: string[][] = [
+    [`Third-Party Risk Assessment – ${sample.vendor}`, ""],
     ["Vendor", sample.vendor],
     ["Service", sample.service],
     ["Assessed on", state.assessedOn],
     ["Prepared by", state.report.preparer],
-    ["Approved", `${approved.by}, ${approved.at}`],
-    ["Recommendation", o.recommendationLine],
+    ["Approved", `${approved.by} on ${approved.at.slice(0, 10)}`],
+    ["Recommendation", o.recommendation!.decision],
     ["Inherent risk", `${o.inherent.level} (${o.tier.label})`],
-    ["Inherent risk rule", o.inherent.reason],
-    ["Questionnaire depth", o.tier.depth],
-    ["Reassessment cadence", o.tier.cadence],
-    ["FIPPA flag", `${o.fippa.triggered ? "Triggered" : "Checked, not triggered"}. ${o.fippa.reason}`],
-    ["Control strength", `${o.strength.strength ?? ""}. ${o.strength.reason}`],
-    ["Residual risk", o.residual ? `${o.residual.level}${o.residual.provisional ? " (provisional)" : ""}. ${o.residual.reason}` : ""],
+    ["Control strength", o.strength.strength ?? ""],
+    ["Residual risk", o.residual ? `${o.residual.level}${o.residual.provisional ? " (provisional)" : ""}` : ""],
+    ["FIPPA status", o.fippa.triggered ? "Triggered: confirm with Privacy Office" : "Checked, not triggered"],
     ["Next review date", date(o.nextReview) || "At contract renewal"],
-    ["Note", "AI-assisted, human-reviewed. Fictional organization. Not legal advice."],
-    ["Disclaimer", sample.disclaimer],
+    ["Open findings", String(open)],
+    ["Note", `AI-assisted, human-reviewed. Fictional organization. ${sample.disclaimer}`],
   ];
-  const iraHeader = ["ID", "Area", "Question", "Answer", "Rating", "Answer in loaded sample", "Follow-up open", "Change reason", "Note"];
+
   const ira = state.ira.map((r) => {
     const q = IRA_QUESTIONS.find((x) => x.id === r.id)!;
-    return [
-      r.id,
-      q.area,
-      q.question,
-      r.answer,
-      rated.find((x) => x.id === r.id)!.rating,
-      r.loadedAnswer,
-      r.answer === "Unknown" ? "Yes" : "No",
-      r.history.at(-1)?.reason ?? "",
-      q.addedAfterV1 ? "Added after v1, not in the manual assessment" : "",
-    ];
+    return [q.area, q.question, r.answer, rated.find((x) => x.id === r.id)!.rating];
   });
 
-  const ddqHeader = ["ID", "Domain", "Question", "Vendor response", "AI-suggested rating", "AI rationale", "Final rating", "Analyst note", "Evidence to request", "Override reason", "Status"];
   const ddq = state.ddq.map((r) => {
     const d = effectiveDecision(r);
     const meta = sample.ddq.find((x) => x.id === r.id)!;
-    return [
-      r.id,
-      meta.domain,
-      meta.question,
-      r.response,
-      r.ai?.rating ?? "",
-      r.ai?.rationale ?? "",
-      r.confirmed && d ? d.rating : "",
-      r.confirmed && d ? d.note : "",
-      d?.evidence ?? "",
-      r.overrideReason ?? "",
-      r.confirmed ? "Confirmed" : "Awaiting review",
-    ];
+    return [meta.domain, meta.question, r.response, r.confirmed && d ? d.rating : "", r.confirmed && d ? d.note : "", d?.evidence ?? ""];
   });
 
-  const findHeader = ["ID", "Kind", "Title", "Source row", "Owner", "Due date", "Status", "Closing note"];
-  const findings = o.findings.map((f) => [f.id, f.kind, f.title, f.sourceRow, f.owner, date(f.dueDate), f.status, f.closeNote ?? ""]);
+  const findings = o.findings.map((f) => [f.id, f.kind, f.title, f.owner, date(f.dueDate), f.status]);
+
+  const audit: string[][] = [["Record", "ID", "AI-suggested rating", "AI rationale", "Override reason", "Status", "Note"]];
+  for (const r of state.ddq) {
+    audit.push(["Due diligence row", r.id, r.ai?.rating ?? "", r.ai?.rationale ?? "", r.overrideReason ?? "", r.confirmed ? "Confirmed" : "Awaiting review", ""]);
+  }
+  for (const r of state.ira) {
+    const last = r.history.at(-1);
+    if (last) audit.push(["IRA answer change", r.id, "", "", "", `${last.from} to ${last.to}`, last.reason]);
+  }
+  const rule = (id: string, text: string) => audit.push(["Rule applied", id, "", "", "", "", text]);
+  rule("Inherent risk", o.inherent.reason);
+  rule("Tier", `${o.tier.label}: ${o.tier.depth}; review ${o.tier.cadence}`);
+  rule("Control strength", o.strength.reason);
+  if (o.residual) rule("Residual risk", o.residual.reason);
+  rule("FIPPA flag", o.fippa.reason);
+  if (o.recommendation) rule("Recommendation", o.recommendation.reason);
+  for (const f of o.findings) if (f.closeNote) audit.push(["Finding closing note", f.id, "", "", "", f.status, f.closeNote]);
 
   return [
-    { name: "Inherent Risk", rows: [...summary, [], iraHeader, ...ira], headerRows: [summary.length + 1], widths: [24, 22, 60, 14, 12, 22, 14, 40, 36] },
-    { name: "Due Diligence", rows: [ddqHeader, ...ddq], headerRows: [0], widths: [10, 26, 50, 60, 16, 50, 16, 50, 40, 36, 16] },
-    { name: "Findings", rows: [findHeader, ...findings], headerRows: [0], widths: [16, 16, 60, 12, 26, 12, 10, 50] },
+    { name: "Summary", rows: summary, labelColumn: true, widths: [24, 45] },
+    { name: "Inherent Risk", rows: [["Area", "Question", "Answer", "Rating"], ...ira], labelColumn: false, widths: [22, 45, 12, 12] },
+    {
+      name: "Due Diligence",
+      rows: [["Domain", "Question", "Vendor response", "Final rating", "Analyst note", "Evidence to request"], ...ddq],
+      labelColumn: false,
+      widths: [24, 40, 45, 16, 40, 40],
+    },
+    { name: "Findings", rows: [["ID", "Type", "Title", "Owner", "Due date", "Status"], ...findings], labelColumn: false, widths: [16, 16, 45, 26, 12, 10] },
+    { name: "Audit trail", rows: audit, labelColumn: false, widths: [22, 18, 18, 45, 30, 18, 45] },
   ];
 }
 
