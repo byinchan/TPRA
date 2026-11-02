@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "note": "Extracted verbatim from the author's manual v1 assessment in /v1. Wording is not edited.",
+    "files": {
+      "ira": "v1/03 - Inherent Risk Assessment (IRA).xlsx",
+      "ddq": "v1/03 - Vendor Security Due Diligence Questionnaire.docx",
+      "summary": "v1/03 - Third-Party Risk Assessment Summary_.docx"
+    },
+    "extractedOn": "2026-11-02"
+  },
+  "vendor": "Deloitte",
+  "service": "AI Governance Consulting",
+  "v1Labels": {
+    "overallInherentRisk": "Medium"
+  },
+  "ira": [
+    {
+      "id": "IRA-01",
+      "area": "Data",
+      "question": "Will confidential information be shared?",
+      "answer": "Yes",
+      "v1Rating": "High"
+    },
+    {
+      "id": "IRA-02",
+      "area": "Data",
+      "question": "Will customer PII be accessed?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-03",
+      "area": "Data",
+      "question": "Will regulated information be processed?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-04",
+      "area": "System Access",
+      "question": "Will the vendor access internal systems?",
+      "answer": "Yes",
+      "v1Rating": "Medium"
+    },
+    {
+      "id": "IRA-05",
+      "area": "System Access",
+      "question": "Will the vendor require privileged access?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-06",
+      "area": "System Access",
+      "question": "Will the vendor connect to the corporate network?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-07",
+      "area": "Service Criticality",
+      "question": "Is this a business-critical service?",
+      "answer": "Yes",
+      "v1Rating": "High"
+    },
+    {
+      "id": "IRA-08",
+      "area": "Service Criticality",
+      "question": "Would an outage significantly impact operations?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-09",
+      "area": "Service Criticality",
+      "question": "Is there an alternate vendor available?",
+      "answer": "Yes",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-10",
+      "area": "Technology",
+      "question": "Will the vendor host company data?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-11",
+      "area": "Technology",
+      "question": "Will cloud services be used?",
+      "answer": "No",
+      "v1Rating": "Low"
+    },
+    {
+      "id": "IRA-12",
+      "area": "Technology",
+      "question": "Will subcontractors be involved?",
+      "answer": "Unknown",
+      "v1Rating": "Medium"
+    },
+    {
+      "id": "IRA-13",
+      "area": "Regulatory",
+      "question": "Will data leave the country?",
+      "answer": "Unknown",
+      "v1Rating": "Medium"
+    },
+    {
+      "id": "IRA-14",
+      "area": "Regulatory",
+      "question": "Are regulatory requirements applicable?",
+      "answer": "Yes",
+      "v1Rating": "Medium"
+    },
+    {
+      "id": "IRA-15",
+      "area": "Regulatory",
+      "question": "Is sensitive intellectual property involved?",
+      "answer": "Yes",
+      "v1Rating": "High"
+    }
+  ],
+  "ddq": [
+    {
+      "id": "DDQ-01",
+      "domain": "Information Security Governance",
+      "question": "Do you maintain a documented Information Security Program?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-02",
+      "domain": "Information Security Governance",
+      "question": "Do you maintain an ISO/IEC 27001 certified ISMS?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-03",
+      "domain": "Information Security Governance",
+      "question": "Can a current ISO/IEC 27001 certificate be provided upon request?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-04",
+      "domain": "Information Security Governance",
+      "question": "Is information security reviewed by executive leadership?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-05",
+      "domain": "Identity & Access Management",
+      "question": "Is MFA required for employee access to corporate systems?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-06",
+      "domain": "Identity & Access Management",
+      "question": "Are privileged accounts reviewed regularly?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-07",
+      "domain": "Identity & Access Management",
+      "question": "Is access removed promptly upon employee termination?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-08",
+      "domain": "Data Protection",
+      "question": "Is confidential client information encrypted in transit?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-09",
+      "domain": "Data Protection",
+      "question": "Is confidential client information encrypted at rest?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-10",
+      "domain": "Data Protection",
+      "question": "Do you maintain documented data retention and disposal procedures?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-11",
+      "domain": "Data Protection",
+      "question": "Will PUC data be stored within Canada?",
+      "response": "No – Data residency will be determined based on the engagement and client requirements."
+    },
+    {
+      "id": "DDQ-12",
+      "domain": "Incident Response",
+      "question": "Do you maintain a documented Incident Response Plan?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-13",
+      "domain": "Incident Response",
+      "question": "Are incident response exercises performed periodically?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-14",
+      "domain": "Incident Response",
+      "question": "Will Deloitte notify PUC of a security incident affecting engagement data?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-15",
+      "domain": "Business Continuity",
+      "question": "Do you maintain Business Continuity and Disaster Recovery plans?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-16",
+      "domain": "Business Continuity",
+      "question": "Are recovery plans tested periodically?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-17",
+      "domain": "Compliance & Assurance",
+      "question": "Has Deloitte completed a SOC 2 Type II audit?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-18",
+      "domain": "Compliance & Assurance",
+      "question": "Can an executive summary of the SOC 2 report be provided under NDA?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-19",
+      "domain": "Compliance & Assurance",
+      "question": "Are independent penetration tests conducted periodically?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-20",
+      "domain": "Third-Party Management",
+      "question": "Does Deloitte maintain a third-party risk management program?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-21",
+      "domain": "Third-Party Management",
+      "question": "Does Deloitte perform security due diligence and ongoing monitoring of critical third-party service providers and subcontractors?",
+      "response": "Yes . Risk-based due diligence is performed before onboarding critical third parties and reassessments throughout the vendor lifecycle are conducted."
+    },
+    {
+      "id": "DDQ-22",
+      "domain": "Third-Party Management",
+      "question": "Are subcontractors subject to security requirements?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-23",
+      "domain": "Third-Party Management",
+      "question": "Will subcontractors be used for this engagement?",
+      "response": "No subcontractors are expected to be used."
+    },
+    {
+      "id": "DDQ-24",
+      "domain": "AI Governance",
+      "question": "Does Deloitte maintain internal policies governing the responsible use of AI?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-25",
+      "domain": "AI Governance",
+      "question": "Are employees provided guidance on the appropriate use of AI technologies?",
+      "response": "Yes"
+    },
+    {
+      "id": "DDQ-26",
+      "domain": "AI Governance",
+      "question": "Will customer information be used to train AI models?",
+      "response": "No"
+    }
+  ],
+  "supportingDocumentationListed": [
+    "ISO/IEC 27001 Certificate",
+    "SOC 2 Type II Executive Summary (under NDA)",
+    "Information Security Policy Overview",
+    "Incident Response Summary",
+    "Business Continuity Overview"
+  ]
+}
