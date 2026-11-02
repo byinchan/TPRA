@@ -31,16 +31,20 @@ export const IRA_QUESTIONS: readonly IraQuestion[] = v1.ira.map(({ id, area, que
 
 export const IRA_AREAS = [...new Set(IRA_QUESTIONS.map((q) => q.area))];
 
+export const FICTIONAL_VENDOR = "Halden Advisory (fictional)";
+export const VENDOR_DISCLAIMER =
+  "Halden Advisory is a fictional vendor. Vendor responses are illustrative and were written for this portfolio. They make no statement about any real organization's security practices.";
+
 export const SAMPLES: Record<string, SampleVendor> = {
-  "v1-deloitte": {
-    id: "v1-deloitte",
-    label: "Sample 1: Deloitte (AI governance consulting)",
-    vendor: v1.vendor,
+  "v1-halden": {
+    id: "v1-halden",
+    label: "Halden Advisory (fictional): AI governance consulting",
+    // The manual v1 named a real firm. The app shows a fictional name; /v1 and data/v1-vendor.json stay as written.
+    vendor: FICTIONAL_VENDOR,
     service: v1.service,
-    disclaimer:
-      "Vendor responses are illustrative and were written for this portfolio. They are not Deloitte's actual responses and make no statement about Deloitte's security practices.",
+    disclaimer: VENDOR_DISCLAIMER,
     iraAnswers: v1.ira.map(({ id, answer }) => ({ id, answer: answer as Answer })),
-    ddq: v1.ddq,
+    ddq: v1.ddq.map((r) => ({ ...r, question: r.question.replaceAll(v1.vendor, "Halden Advisory") })),
   },
 };
 

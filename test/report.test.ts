@@ -26,7 +26,7 @@ import { parseState, setIraAnswer, type AssessmentState } from "../lib/session.t
 import { standardDemoState } from "../scripts/demo-facts-key.ts";
 
 const AT = "2026-11-02T19:00:00.000Z";
-const savedNarrative = () => validateNarrative(DEMO_NARRATIVES["v1-deloitte"]!.output)!.narrative;
+const savedNarrative = () => validateNarrative(DEMO_NARRATIVES["v1-halden"]!.output)!.narrative;
 const factsOf = (s: AssessmentState): ReportFacts => buildFacts(s, computeOutcome(s));
 
 function deps(over: Partial<ReviewDeps> = {}): ReviewDeps {
@@ -118,7 +118,7 @@ test("unassigned owners do not block approval but are listed as unassigned", asy
 
 test("any later change voids the approval; editing a section withdraws it", async () => {
   let s = approveReport(setPreparer(withDueDates(await drafted()), "B. Chan", AT), AT);
-  assert.equal(approvalStatus(setOwner(s, "F-DDQ-11-GAP", "Deloitte engagement lead", AT)), "void");
+  assert.equal(approvalStatus(setOwner(s, "F-DDQ-11-GAP", "Halden engagement lead", AT)), "void");
   assert.equal(approvalStatus(setDueDate(s, "F-DDQ-11-GAP", "2027-01-31", AT)), "void");
   s = editSection(s, "engagement", "Edited after approval.", AT);
   assert.equal(s.report!.approved, null);

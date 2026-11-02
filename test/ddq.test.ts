@@ -20,11 +20,11 @@ import { SAMPLES } from "../lib/sample.ts";
 import { createFromSample, parseState } from "../lib/session.ts";
 
 const AT = "2026-11-02T18:00:00.000Z";
-const sample = SAMPLES["v1-deloitte"]!;
+const sample = SAMPLES["v1-halden"]!;
 
 async function demo(): Promise<ReviewSuccess> {
   const r = await runReview(
-    { sampleId: "v1-deloitte", ira: sample.iraAnswers, demo: true },
+    { sampleId: "v1-halden", ira: sample.iraAnswers, demo: true },
     {
       apiKeyPresent: false,
       limiter: createLimiter({ perIpCalls: 1, perIpWindowMs: 1, dailyCalls: 1 }),

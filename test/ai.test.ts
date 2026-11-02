@@ -16,18 +16,18 @@ import {
 import { REVIEW_SCHEMA, validateReview } from "../lib/ai/schema.ts";
 import { IRA_QUESTIONS, SAMPLES } from "../lib/sample.ts";
 
-const sample = SAMPLES["v1-deloitte"]!;
+const sample = SAMPLES["v1-halden"]!;
 const iraIds = Object.keys(ANSWER_RATINGS);
 const ddqIds = sample.ddq.map((r) => r.id);
 const known = { iraIds, ddqIds };
 const sampleAnswers = sample.iraAnswers.map(({ id, answer }) => ({ id, answer }));
 const req = (over: Partial<ReviewRequest> = {}): ReviewRequest => ({
-  sampleId: "v1-deloitte",
+  sampleId: "v1-halden",
   ira: sampleAnswers,
   demo: false,
   ...over,
 });
-const goodOutput = () => structuredClone(DEMO_REVIEWS["v1-deloitte"]!.output) as { rows: Record<string, unknown>[]; iraInconsistencies: unknown[] };
+const goodOutput = () => structuredClone(DEMO_REVIEWS["v1-halden"]!.output) as { rows: Record<string, unknown>[]; iraInconsistencies: unknown[] };
 
 function deps(over: Partial<ReviewDeps> = {}, call?: () => Promise<ModelCallResult>): ReviewDeps & { logs: unknown[] } {
   const logs: unknown[] = [];
@@ -46,12 +46,12 @@ function deps(over: Partial<ReviewDeps> = {}, call?: () => Promise<ModelCallResu
 // ---------- validator: the model is untrusted ----------
 
 test("saved demo output passes the same validation as live output: 26 rows, 1 Gap, 3 Needs evidence", () => {
-  const r = validateReview(DEMO_REVIEWS["v1-deloitte"]!.output, known)!;
+  const r = validateReview(DEMO_REVIEWS["v1-halden"]!.output, known)!;
   assert.equal(r.review.rows.length, 26);
   assert.deepEqual(r.guardrails, { droppedIds: 0, droppedRows: 0, missingRows: [], truncatedFields: 0 });
   const count = (k: string) => r.review.rows.filter((x) => x.rating === k).length;
   assert.deepEqual([count("Gap"), count("Needs evidence")], [1, 3]);
-  assert.equal(DEMO_REVIEWS["v1-deloitte"]!.source.kind, "mock");
+  assert.equal(DEMO_REVIEWS["v1-halden"]!.source.kind, "mock");
 });
 
 test("unknown IDs are dropped and counted; unknown IRA references are stripped", () => {
@@ -104,7 +104,7 @@ test("schema sent to the model uses only supported features", () => {
 // ---------- request parsing ----------
 
 test("request must be exactly the 16 IRA answers for a known sample", () => {
-  const ok = { sampleId: "v1-deloitte", ira: sampleAnswers };
+  const ok = { sampleId: "v1-halden", ira: sampleAnswers };
   assert.ok(parseReviewRequest(ok));
   assert.equal(parseReviewRequest({ ...ok, sampleId: "other" }), null);
   assert.equal(parseReviewRequest({ ...ok, ira: sampleAnswers.slice(1) }), null);

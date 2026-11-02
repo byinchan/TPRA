@@ -1,4 +1,4 @@
-// Back-test of the rules on the v1 Deloitte sample. Differences from v1 are for Bernadette to decide.
+// Back-test of the rules on the v1 sample (Halden Advisory). Differences from v1 are for Bernadette to decide.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assessInherent } from "../lib/ira.ts";

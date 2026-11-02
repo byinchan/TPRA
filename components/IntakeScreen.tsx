@@ -11,7 +11,7 @@ import { Badge, LevelPill } from "./Badge.tsx";
 import { Steps } from "./Steps.tsx";
 import { useAssessment } from "./useAssessment.ts";
 
-const SAMPLE = SAMPLES["v1-deloitte"]!;
+const SAMPLE = SAMPLES["v1-halden"]!;
 const TAB_ONLY = "Saved only in this browser tab. Closing the tab erases the assessment; nothing is stored on a server.";
 
 function localDate(): string {

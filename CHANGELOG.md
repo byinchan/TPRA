@@ -363,3 +363,20 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 
 ### Notes
 - The summary block in the Inherent Risk sheet carries the recommendation, tier, FIPPA flag, control strength, residual risk, next review date and the vendor disclaimer.
+## PR 9: fictional vendor, About and Content notice, README (2026-11-02)
+
+### Changed
+- **Sample vendor shown as "Halden Advisory (fictional)"** in the app, report, Excel and AI prompt. `lib/sample.ts` swaps the real firm's name in the 5 questionnaire questions that mention it. `/v1` and `data/v1-vendor.json` are unchanged, so the verbatim test still passes. The sample id and demo files are renamed `v1-deloitte` to `v1-halden`; a tab with a saved session from the old id is discarded.
+- **Vendor disclaimer** replaced: the Deloitte-specific text is gone; the new text says the vendor is fictional (CLAUDE.md, app, report footer, README).
+- **Northbridge (Sample 2) moved to the v2 backlog.** No picker is built.
+
+### Added
+- About page and Content notice page (linked in the header); README written (concise).
+
+### Open
+- README says screenshots will be added in `docs/screenshots`; none are taken yet.
+- The saved demo review and narrative are still developer-written placeholders (unchanged).
+
+### Changed after review (PR 9 branch)
+- **Excel restructured into 5 tabs:** Summary (title and label/value rows, no tables), Inherent Risk (4 columns), Due Diligence (6 columns), Findings (6 columns), Audit trail (AI suggestions, override reasons, confirmation status, rules applied, IRA answer changes, closing notes). Bold header with light fill, wrapped top-aligned text, frozen header row, widths capped at 45. Figures still come from `computeOutcome`. Checked by writing the file and reading the XML back.
+- **About and Content notice pages removed.** Their content is in the README. The app footer is one line linking to the README on GitHub; CLAUDE.md no longer asks for in-app explanation pages.

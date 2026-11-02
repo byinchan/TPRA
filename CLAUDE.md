@@ -8,7 +8,7 @@
   Env var: ANTHROPIC_API_KEY (server-side only, never NEXT_PUBLIC_).
 - STORAGE: no accounts, no database, no saved sessions. Current browser tab only.
 - SCOPE: this is v1 (MVP). Two sample vendors, three screens. Anything in "Not in v1" waits for v2.
-  Build everything with Sample 1 first; Sample 2 is the LAST PR and must need no new code paths.
+  Single sample vendor in v1. Sample 2 (Northbridge) moved to the v2 backlog (2026-11-02).
 
 ## What this is
 A public demo in a GRC portfolio for Pacific Utilities Corporation (PUC), a FICTIONAL BC Crown
@@ -21,22 +21,23 @@ Baseline: my manual v1 assessment in /v1 (3 files: Inherent Risk Assessment .xls
 Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
 
 ## Sample vendor (from /v1)
-- Vendor: Deloitte. Service: AI Governance Consulting.
+- Vendor: Halden Advisory (fictional; my manual v1 used a real firm as the example, kept unchanged in /v1 and
+  data/v1-vendor.json; the app shows the fictional name). Service: AI Governance Consulting.
 - Extract the 15 IRA questions (5 areas: Data, System Access, Service Criticality, Technology,
   Regulatory) with their answers and my per-question ratings, and the 26 questionnaire questions
   (8 domains) with the vendor responses, into data/v1-vendor.json. Copy wording exactly from /v1;
   do not invent or "improve" answers. Give stable IDs (IRA-01..IRA-15, DDQ-01..DDQ-26); IRA-16
   is the one question added after v1 (see below).
 - IRA-16 (CONFIRMED, added after v1): "Will employee or other personal information be shared?"
-  Area: Data. Yes = High, No = Low. Deloitte answer: No. It is NOT in the manual assessment: mark it
+  Area: Data. Yes = High, No = Low. Halden answer: No. It is NOT in the manual assessment: mark it
   in the data and the UI as "added after v1, not in the manual assessment". The verbatim v1 test
   covers the original 15 rows only.
 - My v1 overall inherent rating is Medium. Keep it as the back-test target.
 - VENDOR DISCLAIMER (verbatim, on the intake screen, in the report footer and in the README):
-  "Vendor responses are illustrative and were written for this portfolio. They are not Deloitte's
-  actual responses and make no statement about Deloitte's security practices."
+  "Halden Advisory is a fictional vendor. Vendor responses are illustrative and were written for this portfolio.
+  They make no statement about any real organization's security practices."
 
-## Sample 2 (last PR)
+## Sample 2 (MOVED TO v2 BACKLOG, do not build in v1)
 - Vendor: Northbridge Billing Systems (FICTIONAL). Service: cloud-hosted customer billing and
   account management platform (SaaS) for PUC's residential and commercial customers.
 - Purpose: show that a higher-risk engagement gets a different tier and outcome, using the SAME
@@ -48,13 +49,13 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
   exceptions, no Canadian data residency option, breach notification within 72 hours not
   committed). Expected: High inherent risk, Tier 1, Escalate or Approve with conditions.
 - Draft data/sample2-vendor.json and show it to me for approval before wiring it in. I own the content.
-- Intake screen gets a simple sample picker: "Sample 1: Deloitte (AI governance consulting)" /
+- Intake screen gets a simple sample picker: "Halden Advisory (fictional): AI governance consulting" /
   "Sample 2: Northbridge (customer billing SaaS, fictional)". Demo mode needs saved outputs for both.
 - Note in the app and README that Northbridge is fictional.
 
 - SIG content: Shared Assessments SIG is licensed material. Questions in this project are my own
-  wording "based on SIG Lite"; never reproduce SIG question text from memory. Say so on a
-  "Content notice" page. NIST SP 800-161 is a US government publication; attribute NIST.
+  wording "based on SIG Lite"; never reproduce SIG question text from memory. Say so in the README
+  "Content notice" section. NIST SP 800-161 is a US government publication; attribute NIST.
 
 ## Stack and conventions
 - Next.js 16 App Router, React 19, TypeScript 5.9, Tailwind CSS 4 (via @tailwindcss/postcss),
@@ -167,7 +168,7 @@ re-run the v1 back-test after any change.
   assign)", but the report lists those findings as unassigned.
 - Footer: "Fictional organization. AI-assisted, human-reviewed." + the vendor disclaimer.
 
-## Six governance principles (design requirements, visible in the product, same names as Crosswalk)
+## Six governance principles (design requirements, behaviour visible in the product, explained in the README, same names as Crosswalk)
 1. Human-Owned GRC Logic. The AI proposes and the analyst decides. The scoring rules (inherent
    risk, tier, control strength, residual risk, recommendation, FIPPA flag) are fixed and visible
    in the app.
@@ -189,7 +190,10 @@ re-run the v1 back-test after any change.
    (check current terms; do not overclaim).
 
 ## Prototype boundaries and disclaimer
-Verbatim at top of README and in the app footer/About page:
+Verbatim at top of README. The app has NO explanation pages (no About, no Content notice): its footer is one line,
+"Fictional organization and vendor · Prototype, not a commercial TPRM platform · AI-assisted, human-reviewed ·
+How it works →", linking to the README on GitHub. Governance principles, content notice, data handling and
+prototype boundaries live in the README only:
 "This is a workflow and governance prototype, not a commercial TPRM platform or an enterprise-ready product."
 No authentication, no database, no durable persistence, no vendor portal, no integrations, no
 contract management, no continuous monitoring. Enterprise note: in practice this could run in a
