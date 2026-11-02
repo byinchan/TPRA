@@ -1,5 +1,6 @@
 "use client";
 // Screen 1: intake and inherent risk. The analyst sets answers; lib/ computes everything shown in the Code panel.
+import Link from "next/link";
 import { useId, useState } from "react";
 import { ANSWER_RATINGS, FIPPA, UNKNOWN_RATING } from "@/config/rules.ts";
 import { assessInherent, describeChange } from "@/lib/ira.ts";
@@ -77,7 +78,7 @@ export function IntakeScreen() {
 
   return (
     <div className="space-y-6">
-      <Steps current={1} />
+      <Steps current={1} loaded />
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold">Intake & inherent risk</h1>
@@ -209,9 +210,15 @@ export function IntakeScreen() {
             </div>
 
             <p className="border-t border-sky-200 pt-3 text-xs text-stone-600">
-              {state.ddq.length} questionnaire responses loaded. They are reviewed on screen 2 (next pull request).
+              {state.ddq.length} questionnaire responses loaded for the {assessment.tier.depth.toLowerCase()}.
             </p>
           </div>
+          <Link
+            href="/review"
+            className="block rounded bg-stone-900 px-4 py-2 text-center text-sm font-medium text-white hover:bg-stone-700"
+          >
+            Continue to due diligence review →
+          </Link>
           <p className="text-xs text-stone-500">{TAB_ONLY}</p>
         </aside>
       </div>

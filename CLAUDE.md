@@ -72,6 +72,9 @@ Due Diligence Questionnaire .docx, Third-Party Risk Assessment Summary .docx).
   the workbook is generated client-side. Justify it in the PR that adds it.
 - Tests: node --test. CI runs tests before deploy. Branches + PRs so I review the Vercel preview
   before anything reaches main.
+- PR done = checks green: before reporting a PR as done, wait for BOTH the Vercel preview
+  deployment and GitHub CI to finish, confirm both pass, and include the preview URL in the
+  report. If either fails, fix it (or report the failure with its log) instead of calling it done.
 - Tone: a workflow and governance prototype, not a commercial TPRM platform. The AI suggestion,
   the human decision and the calculated result must be visibly separate in the UI.
 

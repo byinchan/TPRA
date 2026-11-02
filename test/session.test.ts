@@ -27,7 +27,8 @@ test("anything that fails validation is discarded", () => {
   const variants: unknown[] = [
     null,
     "not json",
-    { ...good, version: 2 },
+    { ...good, version: 1 },
+    { ...good, version: 3 },
     { ...good, sampleId: "someone-else" },
     { ...good, assessedOn: "2026-13-01" },
     { ...good, ira: good.ira.slice(1) },
