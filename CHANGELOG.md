@@ -105,4 +105,3 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
   - The finding comes from `lib/findings.ts` (`collectFindings`).
   - The recommendation cannot be "Approve" while it is open.
   - Tested: FIPPA triggered, all 26 rows Satisfactory, Strong controls, Low residual → "Approve with conditions".
-- **Backlog (CLAUDE.md):** after TPRA v1 ships, run `npm audit` on the Control-Mapping repo and move it off Next 16.3.6. This is recorded as a maintenance note only; no code or link connects the two projects.

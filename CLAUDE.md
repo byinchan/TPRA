@@ -185,9 +185,6 @@ GRC platform such as ServiceNow VRM or OneTrust; neither is integrated here.
 An OT/SCADA software vendor with NERC CIP-013-aligned supplier checks; blank
 "new vendor" intake; full SIG; uploading vendor evidence files; contract clause review; ongoing
 monitoring and reassessment reminders; multi-vendor dashboard.
-Maintenance after TPRA v1 ships (outside this repo; no code or link between the projects): run
-npm audit on the Control-Mapping repo and move it off Next 16.3.6 the same way (critical
-advisories GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr are fixed from 16.4.1).
 
 ## README (write at the end)
 First person as Bernadette: opening question, what it demonstrates, where AI helps and where it
