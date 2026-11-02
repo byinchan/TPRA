@@ -95,6 +95,24 @@ export function IntakeScreen() {
         </button>
       </header>
 
+      {/* Narrow screens: the Calculated panel sits below the questions, so keep a summary in view. */}
+      <a
+        href="#calculated"
+        aria-label={`Inherent risk ${assessment.inherent.level}, ${assessment.tier.label}, ${assessment.followUps.length} open follow-ups${
+          notices.length > 0 ? ", changed" : ""
+        }. Jump to the calculated results.`}
+        className="sticky top-0 z-10 -mx-4 flex items-center gap-2 border-b border-sky-200 bg-sky-50/95 px-4 py-2 text-sm backdrop-blur lg:hidden"
+      >
+        <LevelPill level={assessment.inherent.level} />
+        <span className="font-medium">{assessment.tier.label}</span>
+        <span className="text-stone-500">·</span>
+        <span>
+          {assessment.followUps.length} follow-up{assessment.followUps.length === 1 ? "" : "s"}
+        </span>
+        {notices.length > 0 && <span className="font-medium text-orange-700">· changed</span>}
+        <span className="ml-auto whitespace-nowrap text-sky-700 underline underline-offset-2">Details ↓</span>
+      </a>
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section className="space-y-5" aria-label="Inherent risk questions">
           <p className="text-sm text-stone-600">
@@ -122,7 +140,11 @@ export function IntakeScreen() {
           ))}
         </section>
 
-        <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start" aria-label="Calculated results">
+        <aside
+          id="calculated"
+          className="scroll-mt-14 space-y-4 lg:sticky lg:top-4 lg:self-start"
+          aria-label="Calculated results"
+        >
           {notices.length > 0 && (
             <div role="status" className="space-y-2 rounded border border-orange-300 bg-orange-50 p-3 text-sm">
               {notices.map((n) => (
