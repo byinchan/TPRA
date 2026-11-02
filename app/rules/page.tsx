@@ -15,7 +15,7 @@ export default function RulesPage() {
         <h1 className="text-2xl font-semibold">Deterministic rules</h1>
         <p className="max-w-2xl text-stone-700">
           <Badge kind="Code" /> applies these rules. The AI never produces a rating, tier or decision.{" "}
-          <Badge kind="Confirmed" /> rules were decided by the analyst; <Badge kind="Draft" /> rules still await sign-off.
+          All rules are <Badge kind="Confirmed" /> by the analyst (2026-11-02).
         </p>
         <ul className="divide-y divide-stone-200 rounded border border-stone-200 bg-white">
           {RULES.map((r) => (

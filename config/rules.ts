@@ -1,5 +1,5 @@
 // Every threshold the app uses lives here. The UI shows these rules; lib/ applies them.
-// CONFIRMED rules were decided by Bernadette on 2026-11-02. DRAFT rules still need her sign-off.
+// All rules were confirmed by Bernadette on 2026-11-02. Change them only with her decision.
 import type { Answer, Level } from "../lib/types.ts";
 
 export type RuleStatus = "Confirmed" | "Draft";
@@ -66,6 +66,8 @@ export const FIPPA = {
   message:
     "FIPPA: storage outside Canada - check whether a supplementary assessment is required (confirm with Privacy Office)",
   notLegalAdvice: "This flag is a prompt for the Privacy Office, not legal advice.",
+  /** A triggered flag opens this finding, so the recommendation cannot be "Approve" while it is open. */
+  findingTitle: "Confirm with Privacy Office whether a supplementary assessment is required",
 } as const;
 
 export const RULES: { id: string; name: string; status: RuleStatus; text: string }[] = [
@@ -84,31 +86,31 @@ export const RULES: { id: string; name: string; status: RuleStatus; text: string
   {
     id: "tier",
     name: "Tier and review cadence",
-    status: "Draft",
+    status: "Confirmed",
     text: "High: Tier 1 (full SIG + evidence, annual review). Medium: Tier 2 (SIG Lite, review every 2 years). Low: Tier 3 (basic check, review at renewal).",
   },
   {
     id: "fippa",
     name: "BC privacy (FIPPA) flag",
     status: "Confirmed",
-    text: "Triggered if data may leave Canada (IRA-13 Yes/Unknown) and personal information may be involved (IRA-02 or IRA-16 Yes/Unknown). Not legal advice.",
+    text: "Triggered if data may leave Canada (IRA-13 Yes/Unknown) and personal information may be involved (IRA-02 or IRA-16 Yes/Unknown). A triggered flag opens a finding to confirm with the Privacy Office. Not legal advice.",
   },
   {
     id: "control-strength",
     name: "Control strength",
-    status: "Draft",
+    status: "Confirmed",
     text: `From confirmed questionnaire rows only. Strong: no Gaps and at most ${CONTROL_STRENGTH.strongMaxNeedsEvidenceShare * 100}% Needs evidence. Adequate: at most ${CONTROL_STRENGTH.adequateMaxGaps} Gap. Weak: otherwise.`,
   },
   {
     id: "residual",
     name: "Residual risk",
-    status: "Draft",
+    status: "Confirmed",
     text: 'Strong: one level below inherent (min Low). Adequate: same as inherent. Weak: one level above (max High). "Provisional" while any Needs evidence row is open.',
   },
   {
     id: "recommendation",
     name: "Recommendation",
-    status: "Draft",
-    text: "Escalate - do not approve yet if residual is High or control strength is Weak. Otherwise Approve with conditions if any finding is open, else Approve.",
+    status: "Confirmed",
+    text: "Escalate - do not approve yet if residual is High or control strength is Weak. Otherwise Approve with conditions if any finding is open (open follow-ups, confirmed Gaps and Needs evidence rows, a triggered FIPPA flag), else Approve.",
   },
 ];

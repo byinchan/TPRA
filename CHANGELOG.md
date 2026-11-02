@@ -94,3 +94,15 @@ Decisions, defaults and back-test differences. Bernadette makes the final call o
 - Control strength (10% Needs evidence; max 1 Gap)
 - Residual risk shift
 - Recommendation
+
+### Update: all rules confirmed (2026-11-02)
+- **Bernadette confirmed the four remaining rules as written:** tier and review cadence, control strength, residual risk shift, and recommendation. `config/rules.ts` now marks every rule as Confirmed.
+- **IRA-13 stays Yes = High.**
+  - The sample loads it as Unknown (Medium, matching v1).
+  - If an analyst resolves it to Yes, the move to High / Tier 1 is intended.
+  - Screen 1 shows the rule that caused the change.
+- **New: a triggered FIPPA flag opens a finding,** "Confirm with Privacy Office whether a supplementary assessment is required".
+  - The finding comes from `lib/findings.ts` (`collectFindings`).
+  - The recommendation cannot be "Approve" while it is open.
+  - Tested: FIPPA triggered, all 26 rows Satisfactory, Strong controls, Low residual → "Approve with conditions".
+- **Backlog (CLAUDE.md):** after TPRA v1 ships, run `npm audit` on the Control-Mapping repo and move it off Next 16.3.6. This is recorded as a maintenance note only; no code or link connects the two projects.

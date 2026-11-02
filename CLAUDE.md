@@ -104,14 +104,16 @@ diligence goes), THEN the vendor questionnaire, THEN residual risk and the repor
 
 ## Deterministic rules (pure functions, one config file, shown in the UI)
 AI proposes, human confirms, CODE computes. Never let a model produce a rating, tier or decision.
-Rules marked CONFIRMED were decided by Bernadette (2026-11-02). Anything else is still a DRAFT:
-back-test on v1, show me results, and wait for my confirmation.
-- IRA answer-to-rating table (CONFIRMED). "Unknown" = Medium for every question + open follow-up.
+ALL rules below are CONFIRMED by Bernadette (2026-11-02). Change them only with her decision, and
+re-run the v1 back-test after any change.
+- IRA answer-to-rating table. "Unknown" = Medium for every question + open follow-up.
   Yes = High, No = Low: IRA-01, 02, 03, 05, 06, 07, 08, 10, 13, 15, 16
   Yes = Medium, No = Low: IRA-04, 11, 12, 14
   Yes = Low, No = Medium: IRA-09 (alternate vendor available)
-  This reproduces all 15 v1 per-question ratings.
-- Inherent risk (CONFIRMED; counts only, no average):
+  This reproduces all 15 v1 per-question ratings. IRA-13 stays Yes = High: the sample loads it as
+  Unknown (Medium, matches v1); if an analyst resolves it to Yes, the move to High / Tier 1 is
+  intended. When an edit changes the inherent risk or tier, show on screen the rule that caused it.
+- Inherent risk (counts only, no average):
   High if IRA-02 (customer PII) = Yes or IRA-03 (regulated info) = Yes, or 4+ Highs in total;
   Low if no Highs and 2 or fewer Mediums; otherwise Medium.
 - Tier: High -> Tier 1 (full SIG + evidence, annual review); Medium -> Tier 2 (SIG Lite,
@@ -122,10 +124,12 @@ back-test on v1, show me results, and wait for my confirmation.
   Weak -> one level above (max High). Marked "Provisional" while any Needs evidence row is open.
 - Recommendation: Approve (no open findings) / Approve with conditions (open findings, residual
   not High) / Escalate - do not approve yet (residual High or control strength Weak).
-- BC privacy flag (CONFIRMED): if data may leave Canada (IRA-13 = Yes/Unknown) AND personal
-  information is involved (IRA-02 or IRA-16 = Yes/Unknown) -> "FIPPA: storage outside Canada -
-  check whether a supplementary assessment is required (confirm with Privacy Office)". If not
-  triggered, show it as checked, not triggered. Not legal advice; say so.
+- BC privacy flag: if data may leave Canada (IRA-13 = Yes/Unknown) AND personal information is
+  involved (IRA-02 or IRA-16 = Yes/Unknown) -> "FIPPA: storage outside Canada - check whether a
+  supplementary assessment is required (confirm with Privacy Office)". If not triggered, show it
+  as checked, not triggered. Not legal advice; say so. A TRIGGERED flag creates an open finding
+  "Confirm with Privacy Office whether a supplementary assessment is required", so the
+  recommendation cannot be "Approve" while it is open.
 - Back-test on the v1 sample: show where the rule disagrees with my v1 labels. Differences are
   for me to decide, not bugs.
 
@@ -181,6 +185,9 @@ GRC platform such as ServiceNow VRM or OneTrust; neither is integrated here.
 An OT/SCADA software vendor with NERC CIP-013-aligned supplier checks; blank
 "new vendor" intake; full SIG; uploading vendor evidence files; contract clause review; ongoing
 monitoring and reassessment reminders; multi-vendor dashboard.
+Maintenance after TPRA v1 ships (outside this repo; no code or link between the projects): run
+npm audit on the Control-Mapping repo and move it off Next 16.3.6 the same way (critical
+advisories GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr are fixed from 16.4.1).
 
 ## README (write at the end)
 First person as Bernadette: opening question, what it demonstrates, where AI helps and where it
