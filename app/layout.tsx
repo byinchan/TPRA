@@ -13,17 +13,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen bg-stone-50 text-stone-900 antialiased">
         <header className="border-b border-stone-200 bg-white">
-          <nav className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-3 text-sm">
+          <nav className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 text-sm">
             <Link href="/" className="font-semibold">
               TPRA <span className="font-normal text-stone-500">· Pacific Utilities Corporation (fictional)</span>
+            </Link>
+            <Link href="/" className="text-stone-600 hover:text-stone-900">
+              Assessment
             </Link>
             <Link href="/rules" className="text-stone-600 hover:text-stone-900">
               Rules
             </Link>
           </nav>
         </header>
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-        <footer className="mx-auto max-w-5xl space-y-1 border-t border-stone-200 px-4 py-6 text-xs text-stone-500">
+        <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+        <footer className="mx-auto max-w-6xl space-y-1 border-t border-stone-200 px-4 py-6 text-xs text-stone-500">
           <p>
             This is a workflow and governance prototype, not a commercial TPRM platform or an enterprise-ready product.
           </p>
